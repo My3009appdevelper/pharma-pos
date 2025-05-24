@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'dart:io';
-import 'package:pos_farmacia/features/stock/inventario/logic/inventario_service.dart';
+import 'package:pos_farmacia/core/services_providers/inventario_service.dart';
 import 'package:pos_farmacia/widgets/elevated_button.dart';
 import 'package:pos_farmacia/widgets/text_form_field.dart';
 import 'package:pos_farmacia/widgets/image_picker_field.dart';
 import 'package:provider/provider.dart';
-import 'package:pos_farmacia/features/stock/inventario/logic/inventario_provider.dart';
-import 'package:pos_farmacia/features/stock/inventario/logic/product_model.dart';
+import 'package:pos_farmacia/core/services_providers/inventario_provider.dart';
+import 'package:pos_farmacia/core/models/product_model.dart';
 
 class AgregarProductoPage extends StatefulWidget {
   const AgregarProductoPage({super.key});
@@ -18,23 +17,19 @@ class AgregarProductoPage extends StatefulWidget {
 class _AgregarProductoPageState extends State<AgregarProductoPage> {
   final _formKey = GlobalKey<FormState>();
 
-  final TextEditingController _codigoController = TextEditingController();
-  final TextEditingController _nombreController = TextEditingController();
-  final TextEditingController _descripcionController = TextEditingController();
-  final TextEditingController _unidadController = TextEditingController();
-  final TextEditingController _precioController = TextEditingController();
-  final TextEditingController _costoController = TextEditingController();
-  final TextEditingController _nuevaCategoriaController =
-      TextEditingController();
-  final TextEditingController _temperaturaMinController =
-      TextEditingController();
-  final TextEditingController _temperaturaMaxController =
-      TextEditingController();
-  final TextEditingController _humedadMaxController = TextEditingController();
-  final TextEditingController _presentacionController = TextEditingController();
+  final _codigoController = TextEditingController();
+  final _nombreController = TextEditingController();
+  final _descripcionController = TextEditingController();
+  final _unidadController = TextEditingController();
+  final _precioController = TextEditingController();
+  final _costoController = TextEditingController();
+  final _nuevaCategoriaController = TextEditingController();
+  final _temperaturaMinController = TextEditingController();
+  final _temperaturaMaxController = TextEditingController();
+  final _humedadMaxController = TextEditingController();
+  final _presentacionController = TextEditingController();
 
   String? _imagenUrlCargada;
-
   bool _requiereRefrigeracion = false;
   bool _requiereReceta = false;
   bool _activo = true;
@@ -99,6 +94,12 @@ class _AgregarProductoPageState extends State<AgregarProductoPage> {
     }
   }
 
+  void _actualizarImagen(String imagePath) {
+    setState(() {
+      _imagenUrlCargada = imagePath;
+    });
+  }
+
   void _agregarNuevaCategoria() {
     final nueva = _nuevaCategoriaController.text.trim();
     if (nueva.isNotEmpty && !_categoriasDisponibles.contains(nueva)) {
@@ -110,14 +111,10 @@ class _AgregarProductoPageState extends State<AgregarProductoPage> {
     }
   }
 
-  void _actualizarImagen(String imagePath) {
-    setState(() {
-      _imagenUrlCargada = imagePath;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    final isWide = MediaQuery.of(context).size.width > 600;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Agregar Producto')),
       body: SingleChildScrollView(
@@ -125,27 +122,79 @@ class _AgregarProductoPageState extends State<AgregarProductoPage> {
         child: Form(
           key: _formKey,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              CustomTextFormField(
-                label: 'Código',
-                controller: _codigoController,
+              ImagePickerField(
+                onImageSelected: _actualizarImagen,
+                initialUrl: _imagenUrlCargada,
               ),
-              CustomTextFormField(
-                label: 'Nombre',
-                controller: _nombreController,
+              const SizedBox(height: 12),
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  SizedBox(
+                    width: isWide ? 280 : double.infinity,
+                    child: CustomTextFormField(
+                      label: 'Código',
+                      controller: _codigoController,
+                    ),
+                  ),
+                  SizedBox(
+                    width: isWide ? 280 : double.infinity,
+                    child: CustomTextFormField(
+                      label: 'Nombre',
+                      controller: _nombreController,
+                    ),
+                  ),
+                  SizedBox(
+                    width: isWide ? 280 : double.infinity,
+                    child: CustomTextFormField(
+                      label: 'Descripción',
+                      controller: _descripcionController,
+                    ),
+                  ),
+                  SizedBox(
+                    width: isWide ? 280 : double.infinity,
+                    child: CustomTextFormField(
+                      label: 'Unidad',
+                      controller: _unidadController,
+                    ),
+                  ),
+                  SizedBox(
+                    width: isWide ? 180 : double.infinity,
+                    child: CustomTextFormField(
+                      label: 'Precio Venta',
+                      controller: _precioController,
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  SizedBox(
+                    width: isWide ? 180 : double.infinity,
+                    child: CustomTextFormField(
+                      label: 'Costo',
+                      controller: _costoController,
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  CustomTextFormField(
+                    label: 'Presentación',
+                    controller: _presentacionController,
+                  ),
+                  CustomTextFormField(
+                    label: 'Humedad Máxima (%)',
+                    controller: _humedadMaxController,
+                    keyboardType: TextInputType.number,
+                  ),
+                ],
               ),
-              CustomTextFormField(
-                label: 'Descripción',
-                controller: _descripcionController,
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                'Categorías',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-              ),
+              const SizedBox(height: 16),
+              const Text('Categorías'),
+              const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
+                runSpacing: 8,
                 children: _categoriasDisponibles.map((cat) {
                   final selected = _categoriasSeleccionadas.contains(cat);
                   return FilterChip(
@@ -177,36 +226,6 @@ class _AgregarProductoPageState extends State<AgregarProductoPage> {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
-              CustomTextFormField(
-                label: 'Unidad',
-                controller: _unidadController,
-              ),
-              CustomTextFormField(
-                label: 'Precio Venta',
-                controller: _precioController,
-                keyboardType: TextInputType.number,
-              ),
-              CustomTextFormField(
-                label: 'Costo',
-                controller: _costoController,
-                keyboardType: TextInputType.number,
-              ),
-              CustomTextFormField(
-                label: 'Presentación',
-                controller: _presentacionController,
-              ),
-              CustomTextFormField(
-                label: 'Humedad Máxima (%)',
-                controller: _humedadMaxController,
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(height: 10),
-              ImagePickerField(
-                onImageSelected: _actualizarImagen,
-                initialUrl: _imagenUrlCargada,
-              ),
-              const SizedBox(height: 10),
               SwitchListTile(
                 title: const Text('¿Requiere Refrigeración?'),
                 value: _requiereRefrigeracion,
