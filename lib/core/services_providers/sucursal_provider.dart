@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pos_farmacia/features/sucursal/logic/sucursal/sucursal_model.dart';
-import 'package:pos_farmacia/features/sucursal/logic/sucursal/sucursal_service.dart';
+import 'package:pos_farmacia/core/models/sucursal_model.dart';
+import 'package:pos_farmacia/core/services_providers/sucursal_service.dart';
 
 class SucursalProvider extends ChangeNotifier {
   List<SucursalModel> _sucursales = [];

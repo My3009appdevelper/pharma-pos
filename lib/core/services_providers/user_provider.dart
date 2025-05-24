@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pos_farmacia/core/database/database_service.dart';
-import 'user_model.dart';
+import '../models/user_model.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
 

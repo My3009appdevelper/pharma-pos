@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pos_farmacia/features/stock/inventario/logic/inventario_service.dart';
-import 'package:pos_farmacia/features/stock/inventario/logic/product_model.dart';
+import 'package:pos_farmacia/core/services_providers/inventario_service.dart';
+import 'package:pos_farmacia/core/models/product_model.dart';
 
 class InventarioProvider extends ChangeNotifier {
   final List<ProductoModel> _productos = [];

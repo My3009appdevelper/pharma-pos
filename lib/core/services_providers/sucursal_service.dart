@@ -1,5 +1,5 @@
 import 'package:pos_farmacia/core/database/database_service.dart';
-import 'package:pos_farmacia/features/sucursal/logic/sucursal/sucursal_model.dart';
+import 'package:pos_farmacia/core/models/sucursal_model.dart';
 
 class SucursalService {
   static Future<void> insertar(SucursalModel sucursal) async {

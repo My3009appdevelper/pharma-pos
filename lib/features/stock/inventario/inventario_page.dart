@@ -1,20 +1,20 @@
 import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 import 'package:pos_farmacia/features/stock/inventario/agregar_producto_page.dart';
-import 'package:pos_farmacia/features/stock/inventario/logic/inventario_provider.dart';
-import 'package:pos_farmacia/features/stock/inventario%20por%20sucursal/logic/inventario_sucursal_provider.dart';
-import 'package:pos_farmacia/features/users/logic/user_provider.dart';
+import 'package:pos_farmacia/core/services_providers/inventario_provider.dart';
+import 'package:pos_farmacia/core/services_providers/inventario_sucursal_provider.dart';
+import 'package:pos_farmacia/core/services_providers/user_provider.dart';
 import 'package:pos_farmacia/widgets/navigation_rail_categories.dart';
-import 'package:pos_farmacia/features/stock/inventario/logic/product_model.dart';
+import 'package:pos_farmacia/core/models/product_model.dart';
 import 'package:pos_farmacia/widgets/product_data_table.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pos_farmacia/features/stock/inventario/logic/inventario_service.dart';
-import 'package:pos_farmacia/features/stock/inventario%20por%20sucursal/logic/inventario_sucursal_model.dart';
-import 'package:pos_farmacia/features/stock/inventario%20por%20sucursal/logic/inventario_sucursal_service.dart';
+import 'package:pos_farmacia/core/services_providers/inventario_service.dart';
+import 'package:pos_farmacia/core/models/inventario_sucursal_model.dart';
+import 'package:pos_farmacia/core/services_providers/inventario_sucursal_service.dart';
 
 import '../inventario por sucursal/agregar_producto_sucursal_page.dart';
 

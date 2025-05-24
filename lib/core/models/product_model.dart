@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pos_farmacia/features/stock/inventario%20por%20sucursal/logic/inventario_sucursal_model.dart';
+import 'package:pos_farmacia/core/models/inventario_sucursal_model.dart';
 
 class Categoria {
   final String nombre;

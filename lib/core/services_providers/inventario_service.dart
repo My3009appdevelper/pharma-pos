@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:pos_farmacia/core/database/database_service.dart';
-import 'package:pos_farmacia/features/stock/inventario/logic/product_model.dart';
+import 'package:pos_farmacia/core/models/product_model.dart';
 
 class InventarioService {
   static Future<void> insertarProducto(ProductoModel producto) async {

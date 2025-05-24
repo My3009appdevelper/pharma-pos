@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
-import 'package:pos_farmacia/features/stock/inventario/logic/inventario_service.dart';
+import 'package:pos_farmacia/core/services_providers/inventario_service.dart';
 import 'package:pos_farmacia/widgets/elevated_button.dart';
 import 'package:pos_farmacia/widgets/text_form_field.dart';
 import 'package:pos_farmacia/widgets/image_picker_field.dart';
 import 'package:provider/provider.dart';
-import 'package:pos_farmacia/features/stock/inventario/logic/inventario_provider.dart';
-import 'package:pos_farmacia/features/stock/inventario/logic/product_model.dart';
+import 'package:pos_farmacia/core/services_providers/inventario_provider.dart';
+import 'package:pos_farmacia/core/models/product_model.dart';
 
 class EditarProductoPage extends StatefulWidget {
   final ProductoModel producto;

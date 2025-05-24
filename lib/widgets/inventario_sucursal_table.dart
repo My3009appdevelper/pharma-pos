@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:pos_farmacia/features/stock/inventario/logic/inventario_provider.dart';
-import 'package:pos_farmacia/features/stock/inventario/logic/product_model.dart';
-import 'package:pos_farmacia/features/stock/inventario por sucursal/logic/inventario_sucursal_model.dart';
+import 'package:pos_farmacia/core/services_providers/inventario_provider.dart';
+import 'package:pos_farmacia/core/models/product_model.dart';
+import 'package:pos_farmacia/core/models/inventario_sucursal_model.dart';
 
 class InventarioSucursalDataTable extends StatefulWidget {
   final List<InventarioSucursalModel> inventarioSucursal;

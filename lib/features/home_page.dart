@@ -3,7 +3,7 @@ import 'package:pos_farmacia/features/stock/stock_page.dart';
 import 'package:pos_farmacia/features/sucursal/sucursal_page.dart';
 import 'package:provider/provider.dart';
 import '../core/themes/theme_provider.dart';
-import 'users/logic/user_provider.dart';
+import '../core/services_providers/user_provider.dart';
 import 'users/usuarios_page.dart';
 
 class HomePage extends StatelessWidget {

@@ -3,13 +3,13 @@ import 'package:pos_farmacia/core/database/database_service.dart';
 import 'package:pos_farmacia/core/themes/dark_mode.dart';
 import 'package:pos_farmacia/core/themes/light_mode.dart';
 import 'package:pos_farmacia/core/themes/theme_provider.dart';
-import 'package:pos_farmacia/features/stock/inventario/logic/inventario_provider.dart';
+import 'package:pos_farmacia/core/services_providers/inventario_provider.dart';
 import 'package:pos_farmacia/features/stock/lotes/logic/lote_product_provider.dart';
-import 'package:pos_farmacia/features/stock/inventario%20por%20sucursal/logic/inventario_sucursal_provider.dart';
-import 'package:pos_farmacia/features/sucursal/logic/sucursal/sucursal_provider.dart';
+import 'package:pos_farmacia/core/services_providers/inventario_sucursal_provider.dart';
+import 'package:pos_farmacia/core/services_providers/sucursal_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'features/users/logic/user_provider.dart';
+import 'core/services_providers/user_provider.dart';
 import 'features/users/login_page.dart';
 
 void main() async {
@@ -17,7 +17,7 @@ void main() async {
   sqfliteFfiInit();
   databaseFactory = databaseFactoryFfi;
 
-  await DatabaseService.borrarBaseDeDatos();
+  //await DatabaseService.borrarBaseDeDatos();
 
   await DatabaseService.database;
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'logic/user_provider.dart';
+import '../../core/services_providers/user_provider.dart';
 import 'user_form_page.dart';
-import 'logic/user_model.dart';
+import '../../core/models/user_model.dart';
 
 class UsuariosPage extends StatelessWidget {
   const UsuariosPage({super.key});

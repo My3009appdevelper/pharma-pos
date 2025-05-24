@@ -1,5 +1,5 @@
 import 'package:pos_farmacia/core/database/database_service.dart';
-import 'package:pos_farmacia/features/stock/inventario%20por%20sucursal/logic/inventario_sucursal_model.dart';
+import 'package:pos_farmacia/core/models/inventario_sucursal_model.dart';
 
 class InventarioSucursalService {
   static Future<void> insertar(InventarioSucursalModel inv) async {
