@@ -104,10 +104,12 @@ class _AgregarProductoSucursalPageState
     );
 
     setState(() => _loading = true);
-    Provider.of<InventarioSucursalProvider>(
+    await Provider.of<InventarioSucursalProvider>(
       context,
       listen: false,
     ).agregarRegistro(registro);
+
+    setState(() => _loading = false);
 
     if (context.mounted) {
       Navigator.pop(context);

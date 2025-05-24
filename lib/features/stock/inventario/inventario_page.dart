@@ -141,63 +141,6 @@ class _InventarioPageState extends State<InventarioPage> {
     }
   }
 
-  Future<void> _importarInventarioSucursalCSV() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['csv'],
-    );
-    if (result != null && result.files.single.path != null) {
-      final path = result.files.single.path!;
-      final input = File(path).openRead();
-      final rows = await input
-          .transform(utf8.decoder)
-          .transform(const CsvToListConverter())
-          .toList();
-
-      final provider = Provider.of<InventarioSucursalProvider>(
-        context,
-        listen: false,
-      );
-
-      for (var row in rows.skip(1)) {
-        final inv = InventarioSucursalModel(
-          idProducto: int.parse(row[0].toString()),
-          idSucursal: int.parse(row[1].toString()),
-          stock: int.parse(row[2].toString()),
-          stockMinimo: int.tryParse(row[3].toString()) ?? 0,
-          lote: row[4]?.toString(),
-          caducidad: DateTime.tryParse(row[5]?.toString() ?? ''),
-          fechaEntrada: DateTime.tryParse(row[6]?.toString() ?? ''),
-          precioCompra: double.tryParse(row[7].toString()),
-          precioVenta: double.tryParse(row[8].toString()),
-          activo: row.length > 10 ? row[9].toString() == '1' : true,
-          ubicacionFisica: row.length > 10 ? row[10].toString() : '',
-        );
-        await InventarioSucursalService.insertar(inv);
-      }
-
-      await provider.cargarDesdeBD();
-
-      final productosUnicos = rows
-          .skip(1)
-          .map((row) => int.parse(row[0].toString()))
-          .toSet();
-
-      for (final idProducto in productosUnicos) {
-        await InventarioSucursalService.actualizarStockGlobal(idProducto);
-      }
-
-      await Provider.of<InventarioProvider>(
-        context,
-        listen: false,
-      ).cargarDesdeBD();
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Inventario por sucursal importado')),
-      );
-    }
-  }
-
   Future<void> _exportarCSV() async {
     final productos = Provider.of<InventarioProvider>(
       context,
@@ -286,47 +229,6 @@ class _InventarioPageState extends State<InventarioPage> {
     ).showSnackBar(SnackBar(content: Text('Exportado a: ${file.path}')));
   }
 
-  Future<void> _exportarInventarioSucursalCSV() async {
-    final inventarioSucursalProvider = Provider.of<InventarioSucursalProvider>(
-      context,
-      listen: false,
-    );
-
-    final registros = inventarioSucursalProvider.inventario;
-
-    final rows = [
-      [
-        'id',
-        'id_producto',
-        'id_sucursal',
-        'stock',
-        'stock_minimo',
-        'lote',
-        'caducidad',
-      ],
-      ...registros.map(
-        (r) => [
-          r.id?.toString() ?? '',
-          r.idProducto,
-          r.idSucursal,
-          r.stock,
-          r.stockMinimo,
-          r.lote ?? '',
-          r.caducidad?.toIso8601String() ?? '',
-        ],
-      ),
-    ];
-
-    final csv = const ListToCsvConverter().convert(rows);
-    final dir = await getApplicationDocumentsDirectory();
-    final file = File('${dir.path}/inventario_por_sucursal_exportado.csv');
-    await file.writeAsString(csv);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Inventario exportado a: ${file.path}')),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final inventario = Provider.of<InventarioProvider>(context);
@@ -371,19 +273,9 @@ class _InventarioPageState extends State<InventarioPage> {
               onPressed: _importarCSV,
             ),
             IconButton(
-              icon: const Icon(Icons.file_upload_rounded),
-              tooltip: 'Importar CSV por Sucursal',
-              onPressed: _importarInventarioSucursalCSV,
-            ),
-            IconButton(
               icon: const Icon(Icons.file_download),
               tooltip: 'Exportar CSV',
               onPressed: _exportarCSV,
-            ),
-            IconButton(
-              icon: const Icon(Icons.file_download_outlined),
-              tooltip: 'Exportar CSV por Sucursal',
-              onPressed: _exportarInventarioSucursalCSV,
             ),
             IconButton(
               icon: const Icon(Icons.add),
@@ -403,28 +295,6 @@ class _InventarioPageState extends State<InventarioPage> {
                       bottom: MediaQuery.of(context).viewInsets.bottom,
                     ),
                     child: const AgregarProductoPage(),
-                  ),
-                );
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.add),
-              tooltip: 'Agregar producto por Sucursal',
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Theme.of(context).colorScheme.surface,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(24),
-                    ),
-                  ),
-                  builder: (context) => Padding(
-                    padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).viewInsets.bottom,
-                    ),
-                    child: const AgregarProductoSucursalPage(),
                   ),
                 );
               },

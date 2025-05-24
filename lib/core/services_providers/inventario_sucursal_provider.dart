@@ -22,9 +22,12 @@ class InventarioSucursalProvider extends ChangeNotifier {
     _inventarioCompleto.addAll(lista);
   }
 
-  void agregarRegistro(InventarioSucursalModel registro) {
-    _inventarioSucursal.add(registro);
-    notifyListeners();
+  Future<void> agregarRegistro(InventarioSucursalModel registro) async {
+    await InventarioSucursalService.insertar(registro); // inserta en BD
+    await InventarioSucursalService.actualizarStockGlobal(
+      registro.idProducto,
+    ); // actualiza stock global
+    await cargarDesdeBD(); // recarga para reflejar los cambios
   }
 
   void actualizarRegistro(int index, InventarioSucursalModel actualizado) {
