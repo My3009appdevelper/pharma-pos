@@ -80,17 +80,28 @@ class _AgregarProductoPageState extends State<AgregarProductoPage> {
     );
 
     setState(() => _loading = true);
-    await InventarioService.insertarProducto(nuevoProducto);
-    await Provider.of<InventarioProvider>(
-      context,
-      listen: false,
-    ).cargarDesdeBD();
 
-    if (context.mounted) {
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Producto agregado exitosamente')),
-      );
+    try {
+      await InventarioService.insertarProducto(nuevoProducto);
+      await Provider.of<InventarioProvider>(
+        context,
+        listen: false,
+      ).cargarDesdeBD();
+
+      if (context.mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Producto agregado exitosamente')),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('⚠️ ${e.toString()}')));
+      }
+    } finally {
+      setState(() => _loading = false);
     }
   }
 

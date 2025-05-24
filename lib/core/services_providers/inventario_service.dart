@@ -5,6 +5,13 @@ import 'package:pos_farmacia/core/models/product_model.dart';
 class InventarioService {
   static Future<void> insertarProducto(ProductoModel producto) async {
     final db = await DatabaseService.database;
+
+    // Validación previa
+    final existente = await buscarPorCodigo(producto.codigo);
+    if (existente != null) {
+      throw Exception('Ya existe un producto con ese código.');
+    }
+
     await db.insert('productos', {
       'codigo_barra': producto.codigo,
       'nombre': producto.nombre,

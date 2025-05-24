@@ -44,6 +44,7 @@ class _InventarioPageState extends State<InventarioPage> {
       type: FileType.custom,
       allowedExtensions: ['csv'],
     );
+
     if (result != null && result.files.single.path != null) {
       final path = result.files.single.path!;
       final input = File(path).openRead();
@@ -53,9 +54,21 @@ class _InventarioPageState extends State<InventarioPage> {
           .toList();
 
       final provider = Provider.of<InventarioProvider>(context, listen: false);
+      int agregados = 0;
+      int duplicados = 0;
 
       for (var row in fields.skip(1)) {
         try {
+          final codigo = row[1].toString().trim();
+
+          // Validar si ya existe
+          final existente = await InventarioService.buscarPorCodigo(codigo);
+          if (existente != null) {
+            debugPrint('⚠️ Producto duplicado con código: $codigo');
+            duplicados++;
+            continue;
+          }
+
           final historialPrecios = row[27]
               .toString()
               .split('|')
@@ -84,7 +97,7 @@ class _InventarioPageState extends State<InventarioPage> {
 
           final producto = ProductoModel(
             id: int.tryParse(row[0].toString()),
-            codigo: row[1].toString(),
+            codigo: codigo,
             nombre: row[2].toString(),
             descripcion: row[3].toString(),
             categorias: row[4]
@@ -96,7 +109,6 @@ class _InventarioPageState extends State<InventarioPage> {
                 .map((e) => e.trim())
                 .where((e) => e.isNotEmpty)
                 .toList(),
-
             unidad: row[5].toString(),
             precio: double.tryParse(row[6].toString()) ?? 0,
             costo: double.tryParse(row[7].toString()) ?? 0,
@@ -128,6 +140,7 @@ class _InventarioPageState extends State<InventarioPage> {
           );
 
           await InventarioService.insertarProducto(producto);
+          agregados++;
         } catch (e) {
           debugPrint('❌ Error importando fila: $e\n$row');
         }
@@ -135,9 +148,13 @@ class _InventarioPageState extends State<InventarioPage> {
 
       await provider.cargarDesdeBD();
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Importación completada')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '✅ Importación completada.\nProductos agregados: $agregados\nDuplicados ignorados: $duplicados',
+          ),
+        ),
+      );
     }
   }
 

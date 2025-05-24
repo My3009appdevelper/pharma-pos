@@ -28,11 +28,28 @@ class _InventarioSucursalPageState extends State<InventarioSucursalPage> {
   String _busqueda = '';
   String _categoriaSeleccionada = 'Todas';
 
+  DateTime? parseFechaDDMMAAAA(String? input) {
+    if (input == null || input.trim().isEmpty) return null;
+
+    final partes = input.trim().split('/');
+    if (partes.length != 3) return null;
+
+    try {
+      final dia = int.parse(partes[0]);
+      final mes = int.parse(partes[1]);
+      final anio = int.parse(partes[2]);
+      return DateTime(anio, mes, dia);
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<void> _importarInventarioSucursalCSV() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['csv'],
     );
+
     if (result != null && result.files.single.path != null) {
       final path = result.files.single.path!;
       final input = File(path).openRead();
@@ -53,8 +70,8 @@ class _InventarioSucursalPageState extends State<InventarioSucursalPage> {
           stock: int.parse(row[2].toString()),
           stockMinimo: int.tryParse(row[3].toString()) ?? 0,
           lote: row[4]?.toString(),
-          caducidad: DateTime.tryParse(row[5]?.toString() ?? ''),
-          fechaEntrada: DateTime.tryParse(row[6]?.toString() ?? ''),
+          caducidad: parseFechaDDMMAAAA(row[5]?.toString()),
+          fechaEntrada: parseFechaDDMMAAAA(row[6]?.toString()),
           precioCompra: double.tryParse(row[7].toString()),
           precioVenta: double.tryParse(row[8].toString()),
           activo: row.length > 10 ? row[9].toString() == '1' : true,
