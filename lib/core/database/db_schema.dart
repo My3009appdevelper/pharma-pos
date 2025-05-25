@@ -117,6 +117,7 @@ class DBSchema {
     precio_venta REAL,
     activo INTEGER DEFAULT 1,
     ubicacion_fisica TEXT,
+    presentacion TEXT,
     FOREIGN KEY(id_producto) REFERENCES productos(id),
     FOREIGN KEY(id_sucursal) REFERENCES sucursales(id)
   );

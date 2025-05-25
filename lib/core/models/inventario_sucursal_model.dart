@@ -11,6 +11,7 @@ class InventarioSucursalModel {
   final double? precioVenta;
   final bool activo;
   final String ubicacionFisica;
+  final String presentacion;
 
   InventarioSucursalModel({
     this.id,
@@ -25,6 +26,7 @@ class InventarioSucursalModel {
     this.precioVenta,
     this.activo = true,
     this.ubicacionFisica = '',
+    this.presentacion = '',
   });
 
   Map<String, dynamic> toMap() => {
@@ -40,6 +42,7 @@ class InventarioSucursalModel {
     'precio_venta': precioVenta,
     'activo': activo ? 1 : 0,
     'ubicacion_fisica': ubicacionFisica,
+    'presentacion': presentacion,
   };
 
   factory InventarioSucursalModel.fromMap(Map<String, dynamic> map) =>
@@ -64,6 +67,7 @@ class InventarioSucursalModel {
             : null,
         activo: map['activo'] == 1,
         ubicacionFisica: map['ubicacion_fisica'] ?? '',
+        presentacion: map['presentacion'] ?? '',
       );
 
   int get stockActual => stock;

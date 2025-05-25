@@ -62,6 +62,9 @@ class _InventarioSucursalDataTableState
                   ),
                   DataColumn(label: SizedBox(width: 100, child: Text('Lote'))),
                   DataColumn(
+                    label: SizedBox(width: 100, child: Text('Presentación')),
+                  ),
+                  DataColumn(
                     label: SizedBox(width: 100, child: Text('Caducidad')),
                   ),
                   DataColumn(
@@ -131,6 +134,17 @@ class _InventarioSucursalDataTableState
                       DataCell(
                         SizedBox(width: 100, child: Text(inv.lote ?? '-')),
                       ),
+
+                      DataCell(
+                        SizedBox(
+                          width: 140,
+                          child: Text(
+                            producto.presentacion ?? '-',
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+
                       DataCell(
                         SizedBox(
                           width: 100,

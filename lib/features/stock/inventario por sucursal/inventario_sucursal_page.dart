@@ -76,6 +76,7 @@ class _InventarioSucursalPageState extends State<InventarioSucursalPage> {
           precioVenta: double.tryParse(row[8].toString()),
           activo: row.length > 10 ? row[9].toString() == '1' : true,
           ubicacionFisica: row.length > 10 ? row[10].toString() : '',
+          presentacion: row.length > 10 ? row[11].toString() : '',
         );
         await InventarioSucursalService.insertar(inv);
       }
@@ -115,6 +116,7 @@ class _InventarioSucursalPageState extends State<InventarioSucursalPage> {
         'id',
         'id_producto',
         'id_sucursal',
+        'presentacion',
         'stock',
         'stock_minimo',
         'lote',
@@ -125,6 +127,7 @@ class _InventarioSucursalPageState extends State<InventarioSucursalPage> {
           r.id?.toString() ?? '',
           r.idProducto,
           r.idSucursal,
+          r.presentacion,
           r.stock,
           r.stockMinimo,
           r.lote ?? '',

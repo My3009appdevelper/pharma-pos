@@ -47,13 +47,31 @@ class _InventarioPageState extends State<InventarioPage> {
 
     if (result != null && result.files.single.path != null) {
       final path = result.files.single.path!;
-      final input = File(path).openRead();
-      final fields = await input
-          .transform(utf8.decoder)
-          .transform(const CsvToListConverter())
-          .toList();
-
       final provider = Provider.of<InventarioProvider>(context, listen: false);
+
+      List<List<dynamic>> fields;
+
+      try {
+        final input = File(path).openRead();
+        fields = await input
+            .transform(utf8.decoder)
+            .transform(const CsvToListConverter())
+            .toList();
+      } catch (e) {
+        debugPrint('❌ Error al leer o parsear el CSV: $e');
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                '⚠️ No se pudo leer el archivo CSV.\nAsegúrate de que esté en formato UTF-8 y con la estructura correcta.',
+              ),
+              duration: Duration(seconds: 5),
+            ),
+          );
+        }
+        return;
+      }
+
       int agregados = 0;
       int duplicados = 0;
 
@@ -61,7 +79,6 @@ class _InventarioPageState extends State<InventarioPage> {
         try {
           final codigo = row[1].toString().trim();
 
-          // Validar si ya existe
           final existente = await InventarioService.buscarPorCodigo(codigo);
           if (existente != null) {
             debugPrint('⚠️ Producto duplicado con código: $codigo');
@@ -153,6 +170,7 @@ class _InventarioPageState extends State<InventarioPage> {
           content: Text(
             '✅ Importación completada.\nProductos agregados: $agregados\nDuplicados ignorados: $duplicados',
           ),
+          duration: const Duration(seconds: 4),
         ),
       );
     }

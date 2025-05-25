@@ -26,6 +26,7 @@ class _AgregarProductoSucursalPageState
   final _precioCompraController = TextEditingController();
   final _precioVentaController = TextEditingController();
   final _ubicacionFisicaController = TextEditingController();
+  final _presentacionController = TextEditingController();
   final _nuevoLoteController = TextEditingController();
 
   DateTime? _fechaEntrada;
@@ -99,6 +100,7 @@ class _AgregarProductoSucursalPageState
       precioCompra: double.tryParse(_precioCompraController.text),
       precioVenta: double.tryParse(_precioVentaController.text),
       ubicacionFisica: _ubicacionFisicaController.text,
+      presentacion: _presentacionController.text,
       lote: _loteSeleccionado,
       activo: _activo,
     );
@@ -201,6 +203,10 @@ class _AgregarProductoSucursalPageState
                         decimal: true,
                       ),
                     ),
+                  ),
+                  CustomTextFormField(
+                    label: 'Presentación',
+                    controller: _presentacionController,
                   ),
                   CustomTextFormField(
                     label: 'Ubicación física',

@@ -14,10 +14,11 @@ import 'features/users/login_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   sqfliteFfiInit();
   databaseFactory = databaseFactoryFfi;
 
-  //await DatabaseService.borrarBaseDeDatos();
+  await DatabaseService.borrarBaseDeDatos();
 
   await DatabaseService.database;
 

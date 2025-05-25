@@ -64,7 +64,9 @@ class _ProductDataTableState extends State<ProductDataTable> {
                   DataColumn(
                     label: SizedBox(width: 150, child: Text('Categorías')),
                   ),
-                  DataColumn(label: SizedBox(width: 80, child: Text('Unidad'))),
+                  DataColumn(
+                    label: SizedBox(width: 120, child: Text('Presentación')),
+                  ),
                   DataColumn(
                     label: SizedBox(
                       width: 60,
@@ -161,9 +163,9 @@ class _ProductDataTableState extends State<ProductDataTable> {
                       ),
                       DataCell(
                         SizedBox(
-                          width: 80,
+                          width: 120,
                           child: Text(
-                            producto.unidad,
+                            producto.presentacion ?? '-',
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
