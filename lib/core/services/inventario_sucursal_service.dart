@@ -81,4 +81,49 @@ class InventarioSucursalService {
       await actualizarStockGlobal(idProducto);
     }
   }
+
+  static Future<void> descontarStock(
+    int idProducto,
+    int idSucursal,
+    int cantidad,
+  ) async {
+    final db = await DatabaseService.database;
+
+    final lotes = await db.query(
+      'inventario_sucursal',
+      where:
+          'id_producto = ? AND id_sucursal = ? AND activo = 1 AND stock_actual > 0',
+      whereArgs: [idProducto, idSucursal],
+      orderBy: 'fecha_entrada ASC',
+    );
+
+    int restante = cantidad;
+
+    for (final lote in lotes) {
+      if (restante <= 0) break;
+
+      final id = lote['id'] as int;
+      final stockActual = lote['stock_actual'] as int;
+
+      final descontar = restante >= stockActual ? stockActual : restante;
+      final nuevoStock = stockActual - descontar;
+
+      await db.update(
+        'inventario_sucursal',
+        {'stock_actual': nuevoStock},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+
+      restante -= descontar;
+    }
+
+    if (restante > 0) {
+      throw Exception(
+        '❌ Stock insuficiente para el producto ID $idProducto en sucursal $idSucursal',
+      );
+    }
+
+    await actualizarStockGlobal(idProducto); // 🔄 Refresca stock global
+  }
 }

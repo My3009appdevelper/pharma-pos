@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pos_farmacia/core/models/venta_model.dart';
 import 'package:pos_farmacia/core/models/detalle_venta_model.dart';
+import 'package:pos_farmacia/core/services/inventario_service.dart';
+import 'package:pos_farmacia/core/services/inventario_sucursal_service.dart';
 import 'package:pos_farmacia/core/services/venta_service.dart';
 
 class VentaProvider extends ChangeNotifier {
@@ -18,6 +20,47 @@ class VentaProvider extends ChangeNotifier {
   Future<void> cargarDesdeDB() async {
     final data = await _service.obtenerVentas();
     cargarVentas(data);
+  }
+
+  Future<void> procesarVenta(
+    VentaModel venta,
+    List<DetalleVentaModel> detalles,
+  ) async {
+    // 1. Validar stock
+    for (final d in detalles) {
+      final lotes = await InventarioSucursalService.obtenerPorProductoYSucursal(
+        d.idProducto,
+        venta.idSucursal,
+      );
+      final stockDisponible = lotes.fold<int>(0, (s, l) => s + l.stock);
+      if (stockDisponible < d.cantidad) {
+        throw Exception('Stock insuficiente para producto ID ${d.idProducto}');
+      }
+    }
+
+    // 2. Descontar del inventario por sucursal
+    for (final d in detalles) {
+      await InventarioSucursalService.descontarStock(
+        d.idProducto,
+        venta.idSucursal,
+        d.cantidad,
+      );
+      await InventarioSucursalService.actualizarStockGlobal(d.idProducto);
+    }
+
+    // 3. Actualizar estadísticas del producto
+    for (final d in detalles) {
+      await InventarioService.actualizarEstadisticasPostVenta(
+        idProducto: d.idProducto,
+        cantidadVendida: d.cantidad,
+      );
+    }
+
+    // 4. Registrar venta + detalles
+    await VentaService().insertarVenta(venta, detalles);
+
+    // 5. Refrescar lista de ventas
+    await cargarDesdeDB();
   }
 
   Future<int> insertarVenta(

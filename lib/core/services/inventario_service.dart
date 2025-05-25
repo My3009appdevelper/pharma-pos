@@ -138,4 +138,33 @@ class InventarioService {
       activo: row['activo'] == 1,
     );
   }
+
+  static Future<void> actualizarEstadisticasPostVenta({
+    required int idProducto,
+    required int cantidadVendida,
+  }) async {
+    final db = await DatabaseService.database;
+
+    // Obtén datos actuales
+    final result = await db.query(
+      'productos',
+      where: 'id = ?',
+      whereArgs: [idProducto],
+    );
+
+    if (result.isEmpty) return;
+
+    final actual = result.first;
+    final historico = (actual['cantidad_vendida_historico'] as int?) ?? 0;
+
+    await db.update(
+      'productos',
+      {
+        'cantidad_vendida_historico': historico + cantidadVendida,
+        'ultima_venta': DateTime.now().toIso8601String(),
+      },
+      where: 'id = ?',
+      whereArgs: [idProducto],
+    );
+  }
 }
