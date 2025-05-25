@@ -65,7 +65,11 @@ class HomePage extends StatelessWidget {
             ),
           ],
         ),
-        body: TabBarView(children: tabViews),
+        body: TabBarView(
+          physics:
+              const NeverScrollableScrollPhysics(), // ⛔ Desactiva swipe lateral
+          children: tabViews,
+        ),
       ),
     );
   }

@@ -18,7 +18,7 @@ void main() async {
   sqfliteFfiInit();
   databaseFactory = databaseFactoryFfi;
 
-  await DatabaseService.borrarBaseDeDatos();
+  //await DatabaseService.borrarBaseDeDatos();
 
   await DatabaseService.database;
 

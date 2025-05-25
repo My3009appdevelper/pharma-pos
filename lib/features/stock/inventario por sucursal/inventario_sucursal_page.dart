@@ -185,7 +185,7 @@ class _InventarioSucursalPageState extends State<InventarioSucursalPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Productos por Categoría'),
+        title: const Text('Productos por Lote'),
         actions: [
           if (Provider.of<UserProvider>(
                 context,

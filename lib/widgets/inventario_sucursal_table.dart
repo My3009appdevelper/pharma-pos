@@ -37,181 +37,197 @@ class _InventarioSucursalDataTableState
     final inventarioProvider = Provider.of<InventarioProvider>(context);
 
     return Expanded(
-      child: Scrollbar(
-        controller: _verticalController,
-        thumbVisibility: true,
-        child: SingleChildScrollView(
+      child: ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(scrollbars: true),
+        child: Scrollbar(
           controller: _verticalController,
-          scrollDirection: Axis.vertical,
-          child: Scrollbar(
-            controller: _horizontalController,
-            thumbVisibility: true,
-            notificationPredicate: (notif) => notif.depth == 1,
-            child: SingleChildScrollView(
+          thumbVisibility: true,
+          child: SingleChildScrollView(
+            controller: _verticalController,
+            scrollDirection: Axis.vertical,
+            child: Scrollbar(
+              scrollbarOrientation: ScrollbarOrientation.top,
               controller: _horizontalController,
-              scrollDirection: Axis.horizontal,
-              child: DataTable(
-                columnSpacing: 20,
-                columns: const [
-                  DataColumn(label: SizedBox(width: 60, child: Text('Imagen'))),
-                  DataColumn(
-                    label: SizedBox(width: 100, child: Text('Código')),
-                  ),
-                  DataColumn(
-                    label: SizedBox(width: 140, child: Text('Nombre')),
-                  ),
-                  DataColumn(label: SizedBox(width: 100, child: Text('Lote'))),
-                  DataColumn(
-                    label: SizedBox(width: 100, child: Text('Presentación')),
-                  ),
-                  DataColumn(
-                    label: SizedBox(width: 100, child: Text('Caducidad')),
-                  ),
-                  DataColumn(
-                    label: SizedBox(width: 110, child: Text('Fecha Entrada')),
-                  ),
-                  DataColumn(label: SizedBox(width: 70, child: Text('Stock'))),
-                  DataColumn(
-                    label: SizedBox(width: 110, child: Text('Precio Compra')),
-                  ),
-                  DataColumn(
-                    label: SizedBox(width: 110, child: Text('Precio Venta')),
-                  ),
-                  DataColumn(
-                    label: SizedBox(
-                      width: 90,
-                      child: Center(child: Text('Activo')),
+              thumbVisibility: true,
+              notificationPredicate: (notification) => true,
+              child: SingleChildScrollView(
+                controller: _horizontalController,
+                scrollDirection: Axis.horizontal,
+                child: DataTable(
+                  columnSpacing: 20,
+                  columns: const [
+                    DataColumn(
+                      label: SizedBox(width: 60, child: Text('Imagen')),
                     ),
-                  ),
-                  DataColumn(
-                    label: SizedBox(
-                      width: 80,
-                      child: Center(child: Text('Editar')),
+                    DataColumn(
+                      label: SizedBox(width: 100, child: Text('Código')),
                     ),
-                  ),
-                ],
-                rows: widget.inventarioSucursal.map((inv) {
-                  final producto = inventarioProvider.productos.firstWhere(
-                    (p) => p.id == inv.idProducto,
-                    orElse: () => ProductoModel.vacio(),
-                  );
+                    DataColumn(
+                      label: SizedBox(width: 140, child: Text('Nombre')),
+                    ),
+                    DataColumn(
+                      label: SizedBox(width: 100, child: Text('Lote')),
+                    ),
+                    DataColumn(
+                      label: SizedBox(width: 100, child: Text('Presentación')),
+                    ),
+                    DataColumn(
+                      label: SizedBox(width: 100, child: Text('Caducidad')),
+                    ),
+                    DataColumn(
+                      label: SizedBox(width: 110, child: Text('Fecha Entrada')),
+                    ),
+                    DataColumn(
+                      label: SizedBox(width: 70, child: Text('Stock')),
+                    ),
+                    DataColumn(
+                      label: SizedBox(width: 110, child: Text('Precio Compra')),
+                    ),
+                    DataColumn(
+                      label: SizedBox(width: 110, child: Text('Precio Venta')),
+                    ),
+                    DataColumn(
+                      label: SizedBox(
+                        width: 90,
+                        child: Center(child: Text('Activo')),
+                      ),
+                    ),
+                    DataColumn(
+                      label: SizedBox(
+                        width: 80,
+                        child: Center(child: Text('Editar')),
+                      ),
+                    ),
+                  ],
+                  rows: widget.inventarioSucursal.map((inv) {
+                    final producto = inventarioProvider.productos.firstWhere(
+                      (p) => p.id == inv.idProducto,
+                      orElse: () => ProductoModel.vacio(),
+                    );
 
-                  return DataRow(
-                    cells: [
-                      DataCell(
-                        producto.imagenUrl != null &&
-                                File(producto.imagenUrl!).existsSync()
-                            ? Image.file(
-                                File(producto.imagenUrl!),
-                                width: 40,
-                                height: 40,
-                                fit: BoxFit.cover,
-                              )
-                            : const Icon(
-                                Icons.image,
-                                size: 30,
-                                color: Colors.grey,
+                    return DataRow(
+                      cells: [
+                        DataCell(
+                          producto.imagenUrl != null &&
+                                  File(producto.imagenUrl!).existsSync()
+                              ? Image.file(
+                                  File(producto.imagenUrl!),
+                                  width: 40,
+                                  height: 40,
+                                  fit: BoxFit.cover,
+                                )
+                              : const Icon(
+                                  Icons.image,
+                                  size: 30,
+                                  color: Colors.grey,
+                                ),
+                        ),
+                        DataCell(
+                          SizedBox(
+                            width: 100,
+                            child: Text(
+                              producto.codigo,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                        DataCell(
+                          SizedBox(
+                            width: 140,
+                            child: Text(
+                              producto.nombre,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                        DataCell(
+                          SizedBox(width: 100, child: Text(inv.lote ?? '-')),
+                        ),
+
+                        DataCell(
+                          SizedBox(
+                            width: 140,
+                            child: Text(
+                              producto.presentacion ?? '-',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+
+                        DataCell(
+                          SizedBox(
+                            width: 100,
+                            child: Text(
+                              inv.caducidad
+                                      ?.toIso8601String()
+                                      .split('T')
+                                      .first ??
+                                  '-',
+                            ),
+                          ),
+                        ),
+                        DataCell(
+                          SizedBox(
+                            width: 110,
+                            child: Text(
+                              inv.fechaEntrada
+                                      ?.toIso8601String()
+                                      .split('T')
+                                      .first ??
+                                  '-',
+                            ),
+                          ),
+                        ),
+                        DataCell(
+                          SizedBox(
+                            width: 70,
+                            child: Text(inv.stock.toString()),
+                          ),
+                        ),
+                        DataCell(
+                          SizedBox(
+                            width: 110,
+                            child: Text(
+                              '\$${inv.precioCompra?.toStringAsFixed(2) ?? '0.00'}',
+                            ),
+                          ),
+                        ),
+                        DataCell(
+                          SizedBox(
+                            width: 110,
+                            child: Text(
+                              '\$${inv.precioVenta?.toStringAsFixed(2) ?? '0.00'}',
+                            ),
+                          ),
+                        ),
+                        DataCell(
+                          SizedBox(
+                            width: 90,
+                            child: Center(
+                              child: Icon(
+                                inv.activo ? Icons.check : Icons.close,
+                                color: inv.activo ? Colors.green : Colors.red,
                               ),
-                      ),
-                      DataCell(
-                        SizedBox(
-                          width: 100,
-                          child: Text(
-                            producto.codigo,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
-                      DataCell(
-                        SizedBox(
-                          width: 140,
-                          child: Text(
-                            producto.nombre,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
-                      DataCell(
-                        SizedBox(width: 100, child: Text(inv.lote ?? '-')),
-                      ),
-
-                      DataCell(
-                        SizedBox(
-                          width: 140,
-                          child: Text(
-                            producto.presentacion ?? '-',
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
-
-                      DataCell(
-                        SizedBox(
-                          width: 100,
-                          child: Text(
-                            inv.caducidad?.toIso8601String().split('T').first ??
-                                '-',
-                          ),
-                        ),
-                      ),
-                      DataCell(
-                        SizedBox(
-                          width: 110,
-                          child: Text(
-                            inv.fechaEntrada
-                                    ?.toIso8601String()
-                                    .split('T')
-                                    .first ??
-                                '-',
-                          ),
-                        ),
-                      ),
-                      DataCell(
-                        SizedBox(width: 70, child: Text(inv.stock.toString())),
-                      ),
-                      DataCell(
-                        SizedBox(
-                          width: 110,
-                          child: Text(
-                            '\$${inv.precioCompra?.toStringAsFixed(2) ?? '0.00'}',
-                          ),
-                        ),
-                      ),
-                      DataCell(
-                        SizedBox(
-                          width: 110,
-                          child: Text(
-                            '\$${inv.precioVenta?.toStringAsFixed(2) ?? '0.00'}',
-                          ),
-                        ),
-                      ),
-                      DataCell(
-                        SizedBox(
-                          width: 90,
-                          child: Center(
-                            child: Icon(
-                              inv.activo ? Icons.check : Icons.close,
-                              color: inv.activo ? Colors.green : Colors.red,
                             ),
                           ),
                         ),
-                      ),
-                      DataCell(
-                        SizedBox(
-                          width: 80,
-                          child: Center(
-                            child: IconButton(
-                              icon: const Icon(Icons.edit),
-                              onPressed: () {
-                                // TODO: Abrir modal para editar el lote
-                              },
+                        DataCell(
+                          SizedBox(
+                            width: 80,
+                            child: Center(
+                              child: IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: () {
+                                  // TODO: Abrir modal para editar el lote
+                                },
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  );
-                }).toList(),
+                      ],
+                    );
+                  }).toList(),
+                ),
               ),
             ),
           ),
