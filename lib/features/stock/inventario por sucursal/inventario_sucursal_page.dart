@@ -12,7 +12,7 @@ import 'package:pos_farmacia/core/models/product_model.dart';
 import 'package:pos_farmacia/core/services_providers/inventario_sucursal_service.dart';
 import 'package:pos_farmacia/core/services_providers/user_provider.dart';
 import 'package:pos_farmacia/features/stock/inventario%20por%20sucursal/agregar_producto_sucursal_page.dart';
-import 'package:pos_farmacia/widgets/inventario_sucursal_table.dart';
+import 'package:pos_farmacia/features/stock/inventario%20por%20sucursal/inventario_sucursal_table.dart';
 import 'package:pos_farmacia/widgets/navigation_rail_categories.dart';
 import 'package:provider/provider.dart';
 

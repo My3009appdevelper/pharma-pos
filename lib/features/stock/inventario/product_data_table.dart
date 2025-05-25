@@ -24,6 +24,99 @@ class _ProductDataTableState extends State<ProductDataTable> {
   final ScrollController _verticalController = ScrollController();
   final ScrollController _horizontalController = ScrollController();
 
+  int? _sortColumnIndex;
+  bool _sortAscending = true;
+  late List<ProductoModel> _productosOrdenados;
+
+  @override
+  void initState() {
+    super.initState();
+    _productosOrdenados = List.from(widget.productos);
+  }
+
+  void _ordenar<T>(
+    Comparable<T> Function(ProductoModel p) getField,
+    int columnIndex,
+    bool ascending,
+  ) {
+    setState(() {
+      _sortColumnIndex = columnIndex;
+      _sortAscending = ascending;
+      _productosOrdenados.sort((a, b) {
+        final aVal = getField(a);
+        final bVal = getField(b);
+        return ascending
+            ? Comparable.compare(aVal, bVal)
+            : Comparable.compare(bVal, aVal);
+      });
+    });
+  }
+
+  @override
+  void didUpdateWidget(ProductDataTable oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _productosOrdenados = List.from(widget.productos);
+    if (_sortColumnIndex != null) {
+      switch (_sortColumnIndex) {
+        case 2:
+          _ordenar((p) => p.codigo, _sortColumnIndex!, _sortAscending);
+          break;
+        case 3:
+          _ordenar((p) => p.nombre, _sortColumnIndex!, _sortAscending);
+          break;
+        case 4:
+          _ordenar((p) => p.precio, _sortColumnIndex!, _sortAscending);
+          break;
+        case 5:
+          _ordenar(
+            (p) => p.categorias.join(', '),
+            _sortColumnIndex!,
+            _sortAscending,
+          );
+          break;
+        case 6:
+          _ordenar(
+            (p) => p.presentacion ?? '',
+            _sortColumnIndex!,
+            _sortAscending,
+          );
+          break;
+        case 7:
+          _ordenar((p) => p.activo ? 1 : 0, _sortColumnIndex!, _sortAscending);
+          break;
+        case 8:
+          _ordenar(
+            (p) =>
+                Provider.of<InventarioSucursalProvider>(context, listen: false)
+                    .inventarioCompleto
+                    .where((r) => r.idProducto == p.id)
+                    .fold<int>(0, (sum, r) => sum + r.stock),
+            _sortColumnIndex!,
+            _sortAscending,
+          );
+          break;
+        case 9:
+          _ordenar(
+            (p) => widget.idSucursalActual == null
+                ? p.stock
+                : Provider.of<InventarioSucursalProvider>(
+                        context,
+                        listen: false,
+                      ).inventario
+                      .where(
+                        (r) =>
+                            r.idProducto == p.id &&
+                            r.idSucursal == widget.idSucursalActual,
+                      )
+                      .fold<int>(0, (sum, r) => sum + r.stock),
+            _sortColumnIndex!,
+            _sortAscending,
+          );
+          break;
+      }
+    }
+  }
+
   @override
   void dispose() {
     _verticalController.dispose();
@@ -54,60 +147,99 @@ class _ProductDataTableState extends State<ProductDataTable> {
               child: SingleChildScrollView(
                 controller: _horizontalController,
                 scrollDirection: Axis.horizontal,
-
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(minWidth: 1000),
                   child: DataTable(
+                    sortColumnIndex: _sortColumnIndex,
+                    sortAscending: _sortAscending,
                     columnSpacing: 20,
-                    columns: const [
-                      DataColumn(
+                    columns: [
+                      const DataColumn(
                         label: SizedBox(width: 70, child: Text('Imagen')),
                       ),
-                      DataColumn(
+                      const DataColumn(
                         label: SizedBox(
                           width: 60,
                           child: Center(child: Text('Editar')),
                         ),
                       ),
                       DataColumn(
-                        label: SizedBox(width: 80, child: Text('Código')),
+                        label: const SizedBox(width: 80, child: Text('Código')),
+                        onSort: (i, asc) => _ordenar((p) => p.codigo, i, asc),
                       ),
                       DataColumn(
-                        label: SizedBox(width: 120, child: Text('Nombre')),
+                        label: const SizedBox(
+                          width: 120,
+                          child: Text('Nombre'),
+                        ),
+                        onSort: (i, asc) => _ordenar((p) => p.nombre, i, asc),
                       ),
                       DataColumn(
-                        label: SizedBox(width: 90, child: Text('Precio')),
+                        label: const SizedBox(width: 90, child: Text('Precio')),
+                        numeric: true,
+                        onSort: (i, asc) => _ordenar((p) => p.precio, i, asc),
                       ),
                       DataColumn(
-                        label: SizedBox(width: 150, child: Text('Categorías')),
+                        label: const SizedBox(
+                          width: 150,
+                          child: Text('Categorías'),
+                        ),
+                        onSort: (i, asc) =>
+                            _ordenar((p) => p.categorias.join(', '), i, asc),
                       ),
                       DataColumn(
-                        label: SizedBox(
+                        label: const SizedBox(
                           width: 120,
                           child: Text('Presentación'),
                         ),
+                        onSort: (i, asc) =>
+                            _ordenar((p) => p.presentacion ?? '', i, asc),
                       ),
                       DataColumn(
-                        label: SizedBox(
+                        label: const SizedBox(
                           width: 40,
                           child: Center(child: Text('Activo')),
                         ),
+                        onSort: (i, asc) =>
+                            _ordenar((p) => p.activo ? 1 : 0, i, asc),
                       ),
-
                       DataColumn(
-                        label: SizedBox(
+                        label: const SizedBox(
                           width: 90,
                           child: Center(child: Text('Stock Global')),
                         ),
+                        numeric: true,
+                        onSort: (i, asc) => _ordenar(
+                          (p) => inventarioSucursalProvider.inventarioCompleto
+                              .where((r) => r.idProducto == p.id)
+                              .fold<int>(0, (sum, r) => sum + r.stock),
+                          i,
+                          asc,
+                        ),
                       ),
                       DataColumn(
-                        label: SizedBox(
+                        label: const SizedBox(
                           width: 110,
                           child: Center(child: Text('Stock Sucursal')),
                         ),
+                        numeric: true,
+                        onSort: (i, asc) => _ordenar(
+                          (p) => widget.idSucursalActual == null
+                              ? p.stock
+                              : inventarioSucursalProvider.inventario
+                                    .where(
+                                      (r) =>
+                                          r.idProducto == p.id &&
+                                          r.idSucursal ==
+                                              widget.idSucursalActual,
+                                    )
+                                    .fold<int>(0, (sum, r) => sum + r.stock),
+                          i,
+                          asc,
+                        ),
                       ),
                     ],
-                    rows: widget.productos.map((producto) {
+                    rows: _productosOrdenados.map((producto) {
                       final stockSucursal = widget.idSucursalActual == null
                           ? producto.stock
                           : inventarioSucursalProvider.inventario
@@ -175,48 +307,29 @@ class _ProductDataTableState extends State<ProductDataTable> {
                             ),
                           ),
                           DataCell(
-                            SizedBox(
-                              width: 80,
-                              child: Text(
-                                producto.codigo,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
+                            SizedBox(width: 80, child: Text(producto.codigo)),
                           ),
                           DataCell(
-                            SizedBox(
-                              width: 120,
-                              child: Text(
-                                producto.nombre,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
+                            SizedBox(width: 120, child: Text(producto.nombre)),
                           ),
                           DataCell(
                             SizedBox(
                               width: 90,
                               child: Text(
                                 '\$${producto.precio.toStringAsFixed(2)}',
-                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ),
                           DataCell(
                             SizedBox(
                               width: 150,
-                              child: Text(
-                                producto.categorias.join(', '),
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                              child: Text(producto.categorias.join(', ')),
                             ),
                           ),
                           DataCell(
                             SizedBox(
                               width: 120,
-                              child: Text(
-                                producto.presentacion ?? '-',
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                              child: Text(producto.presentacion ?? '-'),
                             ),
                           ),
                           DataCell(
@@ -232,15 +345,11 @@ class _ProductDataTableState extends State<ProductDataTable> {
                               ),
                             ),
                           ),
-
                           DataCell(
                             SizedBox(
                               width: 90,
                               child: Center(
-                                child: Text(
-                                  stockGlobal.toString(),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
+                                child: Text(stockGlobal.toString()),
                               ),
                             ),
                           ),
@@ -248,10 +357,7 @@ class _ProductDataTableState extends State<ProductDataTable> {
                             SizedBox(
                               width: 110,
                               child: Center(
-                                child: Text(
-                                  stockSucursal.toString(),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
+                                child: Text(stockSucursal.toString()),
                               ),
                             ),
                           ),

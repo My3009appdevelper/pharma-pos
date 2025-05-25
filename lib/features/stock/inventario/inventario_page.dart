@@ -6,7 +6,7 @@ import 'package:pos_farmacia/core/services_providers/inventario_sucursal_provide
 import 'package:pos_farmacia/core/services_providers/user_provider.dart';
 import 'package:pos_farmacia/widgets/navigation_rail_categories.dart';
 import 'package:pos_farmacia/core/models/product_model.dart';
-import 'package:pos_farmacia/widgets/product_data_table.dart';
+import 'package:pos_farmacia/features/stock/inventario/product_data_table.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'dart:io';
