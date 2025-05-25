@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../core/services_providers/user_provider.dart';
+import '../../core/providers/user_provider.dart';
 import 'user_form_page.dart';
 import '../../core/models/user_model.dart';
 

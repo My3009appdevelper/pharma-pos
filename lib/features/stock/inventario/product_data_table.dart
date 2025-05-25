@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:pos_farmacia/features/stock/inventario/editar_producto_page.dart';
 import 'package:pos_farmacia/core/models/product_model.dart';
-import 'package:pos_farmacia/core/services_providers/inventario_sucursal_provider.dart';
+import 'package:pos_farmacia/core/providers/inventario_sucursal_provider.dart';
 import 'package:provider/provider.dart';
 
 class ProductDataTable extends StatefulWidget {

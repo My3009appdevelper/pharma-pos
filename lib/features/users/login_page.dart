@@ -4,7 +4,7 @@ import 'package:pos_farmacia/features/home_page.dart';
 import 'package:pos_farmacia/widgets/elevated_button.dart';
 import 'package:pos_farmacia/widgets/text_form_field.dart';
 import 'package:provider/provider.dart';
-import '../../core/services_providers/user_provider.dart';
+import '../../core/providers/user_provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

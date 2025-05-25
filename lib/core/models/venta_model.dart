@@ -34,7 +34,6 @@ class VentaModel {
   });
 
   Map<String, dynamic> toMap() => {
-    'id': id,
     'uuid': uuid,
     'folio': folio,
     'fecha': fecha.toIso8601String(),

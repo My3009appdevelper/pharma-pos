@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pos_farmacia/core/services_providers/inventario_service.dart';
+import 'package:pos_farmacia/core/services/inventario_service.dart';
 import 'package:pos_farmacia/core/models/product_model.dart';
 
 class InventarioProvider extends ChangeNotifier {

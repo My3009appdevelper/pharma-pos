@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:pos_farmacia/core/services_providers/inventario_provider.dart';
-import 'package:pos_farmacia/core/services_providers/sucursal_provider.dart';
+import 'package:pos_farmacia/core/providers/inventario_provider.dart';
+import 'package:pos_farmacia/core/providers/sucursal_provider.dart';
 import 'package:pos_farmacia/widgets/elevated_button.dart';
 import 'package:pos_farmacia/widgets/text_form_field.dart';
 import 'package:pos_farmacia/core/models/inventario_sucursal_model.dart';
-import 'package:pos_farmacia/core/services_providers/inventario_sucursal_provider.dart';
+import 'package:pos_farmacia/core/providers/inventario_sucursal_provider.dart';
 
 class AgregarProductoSucursalPage extends StatefulWidget {
   const AgregarProductoSucursalPage({super.key});

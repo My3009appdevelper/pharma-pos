@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:pos_farmacia/core/services_providers/inventario_service.dart';
+import 'package:pos_farmacia/core/services/inventario_service.dart';
 import 'package:pos_farmacia/widgets/elevated_button.dart';
 import 'package:pos_farmacia/widgets/text_form_field.dart';
 import 'package:pos_farmacia/widgets/image_picker_field.dart';
 import 'package:provider/provider.dart';
-import 'package:pos_farmacia/core/services_providers/inventario_provider.dart';
+import 'package:pos_farmacia/core/providers/inventario_provider.dart';
 import 'package:pos_farmacia/core/models/product_model.dart';
 
 class AgregarProductoPage extends StatefulWidget {

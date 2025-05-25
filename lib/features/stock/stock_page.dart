@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pos_farmacia/features/stock/inventario/inventario_page.dart';
 import 'package:pos_farmacia/features/stock/inventario%20por%20sucursal/inventario_sucursal_page.dart';
-import 'package:pos_farmacia/features/stock/lotes/lotes_page.dart';
-import 'package:pos_farmacia/core/services_providers/inventario_provider.dart';
-import 'package:pos_farmacia/core/services_providers/inventario_sucursal_provider.dart';
-import 'package:pos_farmacia/core/services_providers/sucursal_provider.dart';
-import 'package:pos_farmacia/core/services_providers/user_provider.dart';
+import 'package:pos_farmacia/core/providers/inventario_provider.dart';
+import 'package:pos_farmacia/core/providers/inventario_sucursal_provider.dart';
+import 'package:pos_farmacia/core/providers/sucursal_provider.dart';
+import 'package:pos_farmacia/core/providers/user_provider.dart';
 
 class StockPage extends StatefulWidget {
   const StockPage({super.key});

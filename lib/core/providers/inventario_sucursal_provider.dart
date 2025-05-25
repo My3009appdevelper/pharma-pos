@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pos_farmacia/core/models/inventario_sucursal_model.dart';
-import 'package:pos_farmacia/core/services_providers/inventario_sucursal_service.dart';
+import 'package:pos_farmacia/core/services/inventario_sucursal_service.dart';
 
 class InventarioSucursalProvider extends ChangeNotifier {
   final List<InventarioSucursalModel> _inventarioSucursal = [];
