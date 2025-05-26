@@ -43,6 +43,18 @@ class InventarioService {
     });
   }
 
+  static Future<bool> codigoExiste(String codigo, {int? exceptId}) async {
+    final db = await DatabaseService.database;
+    final result = await db.query(
+      'productos',
+      where: exceptId != null
+          ? 'codigo_barra = ? AND id != ?'
+          : 'codigo_barra = ?',
+      whereArgs: exceptId != null ? [codigo, exceptId] : [codigo],
+    );
+    return result.isNotEmpty;
+  }
+
   static Future<List<ProductoModel>> obtenerTodosLosProductos() async {
     final db = await DatabaseService.database;
     final result = await db.query('productos');
@@ -51,9 +63,11 @@ class InventarioService {
 
   static Future<void> actualizarProducto(ProductoModel producto) async {
     final db = await DatabaseService.database;
+
     await db.update(
       'productos',
       {
+        'codigo_barra': producto.codigo,
         'nombre': producto.nombre,
         'descripcion': producto.descripcion,
         'categorias': producto.categorias.join(','),
@@ -80,8 +94,8 @@ class InventarioService {
         'comprados_junto_a': jsonEncode(producto.compradosJuntoA),
         'activo': producto.activo ? 1 : 0,
       },
-      where: 'codigo_barra = ?',
-      whereArgs: [producto.codigo],
+      where: 'id = ?',
+      whereArgs: [producto.id],
     );
   }
 

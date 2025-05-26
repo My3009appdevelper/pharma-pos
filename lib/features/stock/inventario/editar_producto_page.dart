@@ -83,8 +83,10 @@ class _EditarProductoPageState extends State<EditarProductoPage> {
   Future<void> _guardarProducto() async {
     if (!_formKey.currentState!.validate()) return;
 
+    final codigoNuevo = _codigoController.text.trim();
     final productoEditado = widget.producto.copyWith(
-      codigo: _codigoController.text.trim(),
+      id: widget.producto.id,
+      codigo: codigoNuevo,
       nombre: _nombreController.text.trim(),
       descripcion: _descripcionController.text.trim(),
       categorias: _categoriasSeleccionadas,
@@ -107,19 +109,46 @@ class _EditarProductoPageState extends State<EditarProductoPage> {
 
     setState(() => _loading = true);
 
-    await InventarioService.actualizarProducto(productoEditado);
+    try {
+      // Validación previa de código duplicado
+      final yaExiste = await InventarioService.codigoExiste(
+        codigoNuevo,
+        exceptId: widget.producto.id,
+      );
 
-    final inventarioProvider = Provider.of<InventarioProvider>(
-      context,
-      listen: false,
-    );
-    inventarioProvider.reemplazarProducto(productoEditado);
+      if (yaExiste) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                '❌ Ya existe un producto con ese código, intente con otro',
+              ),
+            ),
+          );
+        }
+        return;
+      }
 
-    if (context.mounted) {
-      Navigator.pop(context);
-      ScaffoldMessenger.of(
+      await InventarioService.actualizarProducto(productoEditado);
+      Provider.of<InventarioProvider>(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Producto actualizado')));
+        listen: false,
+      ).reemplazarProducto(productoEditado);
+
+      if (context.mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('✅ Producto actualizado')));
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('⚠️ Error al actualizar: ${e.toString()}')),
+        );
+      }
+    } finally {
+      setState(() => _loading = false);
     }
   }
 

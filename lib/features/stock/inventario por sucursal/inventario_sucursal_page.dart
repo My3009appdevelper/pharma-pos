@@ -161,9 +161,10 @@ class _InventarioSucursalPageState extends State<InventarioSucursalPage> {
           ..sort();
 
     final productosFiltrados = inventarioProvider.productos.where((p) {
-      final coincideBusqueda = p.nombre.toLowerCase().contains(
-        _busqueda.toLowerCase(),
-      );
+      final coincideBusqueda =
+          p.nombre.toLowerCase().contains(_busqueda.toLowerCase()) ||
+          p.codigo.toLowerCase().contains(_busqueda.toLowerCase());
+
       final coincideCategoria =
           _categoriaSeleccionada == 'Todas' ||
           p.categorias.contains(_categoriaSeleccionada);
