@@ -106,11 +106,14 @@ class _EditarProductoPageState extends State<EditarProductoPage> {
     );
 
     setState(() => _loading = true);
+
     await InventarioService.actualizarProducto(productoEditado);
-    await Provider.of<InventarioProvider>(
+
+    final inventarioProvider = Provider.of<InventarioProvider>(
       context,
       listen: false,
-    ).cargarDesdeBD();
+    );
+    inventarioProvider.reemplazarProducto(productoEditado);
 
     if (context.mounted) {
       Navigator.pop(context);

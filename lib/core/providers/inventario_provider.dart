@@ -76,6 +76,14 @@ class InventarioProvider extends ChangeNotifier {
     }
   }
 
+  void reemplazarProducto(ProductoModel actualizado) {
+    final index = _productos.indexWhere((p) => p.id == actualizado.id);
+    if (index != -1) {
+      _productos[index] = actualizado;
+      notifyListeners();
+    }
+  }
+
   Future<void> cargarDesdeBD() async {
     final lista = await InventarioService.obtenerTodosLosProductos();
     cargarDesdeBaseDeDatos(lista);

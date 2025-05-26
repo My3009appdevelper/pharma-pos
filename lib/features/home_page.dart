@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pos_farmacia/features/stock/stock_page.dart';
 import 'package:pos_farmacia/features/sucursal/sucursal_page.dart';
+import 'package:pos_farmacia/features/ventas/ventas_page.dart';
 import 'package:provider/provider.dart';
 import '../core/themes/theme_provider.dart';
 import '../core/providers/user_provider.dart';
@@ -29,7 +30,7 @@ class HomePage extends StatelessWidget {
     ];
 
     final tabViews = <Widget>[
-      const Text('Ventas'),
+      VentasPage(),
       StockPage(),
       const Text('Corte de Caja'),
       const Text('Operaciones'),
