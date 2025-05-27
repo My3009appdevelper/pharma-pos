@@ -142,7 +142,7 @@ class DBSchema {
   static const String createVentaDetalle = '''
   CREATE TABLE IF NOT EXISTS venta_detalle (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    uuid_venta INTEGER,
+    uuid_venta TEXT,
     id_producto INTEGER,
     cantidad INTEGER,
     precio_unitario REAL,

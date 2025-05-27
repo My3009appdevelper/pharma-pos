@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pos_farmacia/core/database/database_service.dart';
 import 'package:pos_farmacia/core/models/venta_model.dart';
 import 'package:pos_farmacia/core/models/detalle_venta_model.dart';
 import 'package:pos_farmacia/core/services/inventario_service.dart';
@@ -26,41 +27,67 @@ class VentaProvider extends ChangeNotifier {
     VentaModel venta,
     List<DetalleVentaModel> detalles,
   ) async {
-    // 1. Validar stock
-    for (final d in detalles) {
-      final lotes = await InventarioSucursalService.obtenerPorProductoYSucursal(
-        d.idProducto,
-        venta.idSucursal,
-      );
-      final stockDisponible = lotes.fold<int>(0, (s, l) => s + l.stock);
-      if (stockDisponible < d.cantidad) {
-        throw Exception('Stock insuficiente para producto ID ${d.idProducto}');
+    final db = await DatabaseService.database;
+    await db.transaction((txn) async {
+      for (final d in detalles) {
+        final lotes = await txn.query(
+          'inventario_sucursal',
+          where:
+              'id_producto = ? AND id_sucursal = ? AND activo = 1 AND stock_actual > 0',
+          whereArgs: [d.idProducto, venta.idSucursal],
+          orderBy: 'fecha_entrada ASC',
+        );
+
+        int restante = d.cantidad;
+        for (final lote in lotes) {
+          if (restante <= 0) break;
+          final stock = lote['stock_actual'] as int;
+          final id = lote['id'] as int;
+          final descontar = restante >= stock ? stock : restante;
+          final nuevoStock = stock - descontar;
+          await txn.update(
+            'inventario_sucursal',
+            {'stock_actual': nuevoStock},
+            where: 'id = ?',
+            whereArgs: [id],
+          );
+          restante -= descontar;
+        }
+
+        if (restante > 0)
+          throw Exception('Stock insuficiente para producto ${d.idProducto}');
       }
-    }
 
-    // 2. Descontar del inventario por sucursal
-    for (final d in detalles) {
-      await InventarioSucursalService.descontarStock(
-        d.idProducto,
-        venta.idSucursal,
-        d.cantidad,
-      );
-      await InventarioSucursalService.actualizarStockGlobal(d.idProducto);
-    }
+      for (final d in detalles) {
+        final stats = await txn.query(
+          'productos',
+          where: 'id = ?',
+          whereArgs: [d.idProducto],
+        );
+        if (stats.isNotEmpty) {
+          final actual = stats.first;
+          final historico = (actual['cantidad_vendida_historico'] as int?) ?? 0;
+          await txn.update(
+            'productos',
+            {
+              'cantidad_vendida_historico': historico + d.cantidad,
+              'ultima_venta': DateTime.now().toIso8601String(),
+            },
+            where: 'id = ?',
+            whereArgs: [d.idProducto],
+          );
+        }
+      }
 
-    // 3. Actualizar estadísticas del producto
-    for (final d in detalles) {
-      await InventarioService.actualizarEstadisticasPostVenta(
-        idProducto: d.idProducto,
-        cantidadVendida: d.cantidad,
-      );
-    }
+      final idVenta = await txn.insert('ventas', venta.toMap());
+      for (final d in detalles) {
+        final map = d.toMap();
+        map['uuid_venta'] = idVenta;
+        await txn.insert('venta_detalle', map);
+      }
+    });
 
-    // 4. Registrar venta + detalles
-    await VentaService().insertarVenta(venta, detalles);
-
-    // 5. Refrescar lista de ventas
-    await cargarDesdeDB();
+    await cargarDesdeDB(); // recargar ventas
   }
 
   Future<int> insertarVenta(
