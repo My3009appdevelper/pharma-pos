@@ -14,7 +14,7 @@ class VentaService {
 
       for (final detalle in detalles) {
         final detalleMap = detalle.toMap();
-        detalleMap['id_venta'] = idVenta; // 🔧 Agrega idVenta directamente
+        detalleMap['uuid_venta'] = idVenta; // 🔧 Agrega idVenta directamente
         await txn.insert('venta_detalle', detalleMap);
       }
 
@@ -32,7 +32,7 @@ class VentaService {
     final db = await DatabaseService.database;
     final result = await db.query(
       'venta_detalle',
-      where: 'id_venta = ?',
+      where: 'uuid_venta = ?',
       whereArgs: [idVenta],
     );
     return result.map(DetalleVentaModel.fromMap).toList();
@@ -42,7 +42,7 @@ class VentaService {
     final db = await DatabaseService.database;
     await db.delete(
       'venta_detalle',
-      where: 'id_venta = ?',
+      where: 'uuid_venta = ?',
       whereArgs: [idVenta],
     );
     await db.delete('ventas', where: 'id = ?', whereArgs: [idVenta]);

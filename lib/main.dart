@@ -35,7 +35,6 @@ void main() async {
         ChangeNotifierProvider(create: (_) => SucursalProvider()),
         ChangeNotifierProvider(create: (_) => InventarioSucursalProvider()),
         ChangeNotifierProvider(create: (_) => VentaProvider()),
-
         ChangeNotifierProvider(create: (_) => DetalleVentaProvider()),
       ],
       child: const MyApp(),

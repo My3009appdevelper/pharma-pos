@@ -27,7 +27,7 @@ class DetalleVentaModel {
 
   Map<String, dynamic> toMap() => {
     'id': id,
-    'uuid_venta': uuidVenta,
+    'uuid_venta ': uuidVenta,
     'id_producto': idProducto,
     'cantidad': cantidad,
     'precio_unitario': precioUnitario,

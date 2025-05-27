@@ -120,12 +120,18 @@ class DBSchema {
   static const String createVentas = '''
   CREATE TABLE IF NOT EXISTS ventas (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    uuid TEXT UNIQUE,
+    folio TEXT UNIQUE,
     fecha TEXT,
-    total REAL,
-    metodo_pago TEXT,
-    cliente_nombre TEXT,
     id_usuario INTEGER,
     id_sucursal INTEGER,
+    id_cliente INTEGER,
+    total REAL,
+    subtotal REAL,
+    descuento_total REAL,
+    metodo_pago TEXT,
+    creado_en TEXT,
+    modificado_en TEXT,
     observaciones TEXT,
     sincronizado INTEGER DEFAULT 0,
     FOREIGN KEY(id_usuario) REFERENCES usuarios(id),
@@ -136,14 +142,19 @@ class DBSchema {
   static const String createVentaDetalle = '''
   CREATE TABLE IF NOT EXISTS venta_detalle (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    id_venta INTEGER,
+    uuid_venta INTEGER,
     id_producto INTEGER,
     cantidad INTEGER,
-    precio_unit REAL,
+    precio_unitario REAL,
     descuento REAL DEFAULT 0,
-    subtotal REAL,
-    FOREIGN KEY(id_venta) REFERENCES ventas(id),
+    total REAL,
+    id_sucursal INTEGER,
+    creado_en TEXT,
+    modificado_en TEXT,
+    sincronizado INTEGER DEFAULT 0,
+    FOREIGN KEY(uuid_venta) REFERENCES ventas(uuid),
     FOREIGN KEY(id_producto) REFERENCES productos(id)
+    FOREIGN KEY(id_producto) REFERENCES sucursales(id)
   );
 ''';
 }
