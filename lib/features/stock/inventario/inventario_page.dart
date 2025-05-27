@@ -12,11 +12,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pos_farmacia/core/services/inventario_service.dart';
-import 'package:pos_farmacia/core/models/inventario_sucursal_model.dart';
-import 'package:pos_farmacia/core/services/inventario_sucursal_service.dart';
-
-import '../inventario por sucursal/agregar_producto_sucursal_page.dart';
 
 final List<Categoria> categoriasFarmacia = [
   Categoria(nombre: 'Medicamentos', icono: Icons.medication),
@@ -79,7 +74,7 @@ class _InventarioPageState extends State<InventarioPage> {
         try {
           final codigo = row[1].toString().trim();
 
-          final existente = await InventarioService.buscarPorCodigo(codigo);
+          final existente = await provider.buscarPorCodigoEnBD(codigo);
           if (existente != null) {
             debugPrint('⚠️ Producto duplicado con código: $codigo');
             duplicados++;
@@ -156,10 +151,10 @@ class _InventarioPageState extends State<InventarioPage> {
             activo: row.length > 29 ? row[29].toString() == '1' : true,
           );
 
-          await InventarioService.insertarProducto(producto);
+          await provider.agregarProducto(producto);
           agregados++;
         } catch (e) {
-          debugPrint('❌ Error importando fila: $e\n$row');
+          debugPrint('❌ Error importando fila: $e\\n$row');
         }
       }
 

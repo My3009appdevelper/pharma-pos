@@ -30,14 +30,25 @@ class InventarioSucursalProvider extends ChangeNotifier {
     await cargarDesdeBD(); // recarga para reflejar los cambios
   }
 
-  void actualizarRegistro(int index, InventarioSucursalModel actualizado) {
+  Future<void> actualizarRegistro(
+    int index,
+    InventarioSucursalModel actualizado,
+  ) async {
+    await InventarioSucursalService.actualizar(actualizado);
     _inventarioSucursal[index] = actualizado;
+    await InventarioSucursalService.actualizarStockGlobal(
+      actualizado.idProducto,
+    );
     notifyListeners();
   }
 
-  void eliminarRegistro(int index) {
-    _inventarioSucursal.removeAt(index);
-    notifyListeners();
+  Future<void> eliminarRegistro(int index) async {
+    final id = _inventarioSucursal[index].id;
+    if (id != null) {
+      await InventarioSucursalService.eliminar(id);
+      _inventarioSucursal.removeAt(index);
+      notifyListeners();
+    }
   }
 
   List<InventarioSucursalModel> obtenerPorSucursal(int idSucursal) {

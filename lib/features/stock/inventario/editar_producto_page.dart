@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
-import 'package:pos_farmacia/core/services/inventario_service.dart';
 import 'package:pos_farmacia/widgets/elevated_button.dart';
 import 'package:pos_farmacia/widgets/text_form_field.dart';
 import 'package:pos_farmacia/widgets/image_picker_field.dart';
@@ -111,10 +110,10 @@ class _EditarProductoPageState extends State<EditarProductoPage> {
 
     try {
       // Validación previa de código duplicado
-      final yaExiste = await InventarioService.codigoExiste(
-        codigoNuevo,
-        exceptId: widget.producto.id,
-      );
+      final yaExiste = await Provider.of<InventarioProvider>(
+        context,
+        listen: false,
+      ).codigoExiste(codigoNuevo, exceptId: widget.producto.id);
 
       if (yaExiste) {
         if (context.mounted) {
@@ -129,8 +128,7 @@ class _EditarProductoPageState extends State<EditarProductoPage> {
         return;
       }
 
-      await InventarioService.actualizarProducto(productoEditado);
-      Provider.of<InventarioProvider>(
+      await Provider.of<InventarioProvider>(
         context,
         listen: false,
       ).reemplazarProducto(productoEditado);

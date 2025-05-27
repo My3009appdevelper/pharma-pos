@@ -43,6 +43,12 @@ class InventarioService {
     });
   }
 
+  static Future<void> eliminarProducto(int id) async {
+    final db = await DatabaseService.database;
+
+    await db.delete('productos', where: 'id = ?', whereArgs: [id]);
+  }
+
   static Future<bool> codigoExiste(String codigo, {int? exceptId}) async {
     final db = await DatabaseService.database;
     final result = await db.query(

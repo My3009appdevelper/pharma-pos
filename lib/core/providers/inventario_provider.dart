@@ -7,18 +7,21 @@ class InventarioProvider extends ChangeNotifier {
 
   List<ProductoModel> get productos => List.unmodifiable(_productos);
 
-  void agregarProducto(ProductoModel producto) {
+  Future<void> agregarProducto(ProductoModel producto) async {
+    await InventarioService.insertarProducto(producto);
     _productos.add(producto);
     notifyListeners();
   }
 
-  void actualizarProducto(int index, ProductoModel actualizado) {
+  Future<void> actualizarProducto(int index, ProductoModel actualizado) async {
+    await InventarioService.actualizarProducto(actualizado);
     _productos[index] = actualizado;
     notifyListeners();
   }
 
-  void eliminarProducto(int index) {
-    _productos.removeAt(index);
+  Future<void> eliminarProducto(int id) async {
+    await InventarioService.eliminarProducto(id);
+    _productos.removeWhere((p) => p.id == id);
     notifyListeners();
   }
 
@@ -34,6 +37,14 @@ class InventarioProvider extends ChangeNotifier {
     } catch (_) {
       return null;
     }
+  }
+
+  Future<ProductoModel?> buscarPorCodigoEnBD(String codigo) async {
+    return await InventarioService.buscarPorCodigo(codigo);
+  }
+
+  Future<bool> codigoExiste(String codigo, {int? exceptId}) async {
+    return await InventarioService.codigoExiste(codigo, exceptId: exceptId);
   }
 
   void registrarVenta(String codigo, int cantidad) {
@@ -76,7 +87,8 @@ class InventarioProvider extends ChangeNotifier {
     }
   }
 
-  void reemplazarProducto(ProductoModel actualizado) {
+  Future<void> reemplazarProducto(ProductoModel actualizado) async {
+    await InventarioService.actualizarProducto(actualizado);
     final index = _productos.indexWhere((p) => p.id == actualizado.id);
     if (index != -1) {
       _productos[index] = actualizado;

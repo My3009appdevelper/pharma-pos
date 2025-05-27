@@ -82,11 +82,10 @@ class _AgregarProductoPageState extends State<AgregarProductoPage> {
     setState(() => _loading = true);
 
     try {
-      await InventarioService.insertarProducto(nuevoProducto);
       await Provider.of<InventarioProvider>(
         context,
         listen: false,
-      ).cargarDesdeBD();
+      ).agregarProducto(nuevoProducto);
 
       if (context.mounted) {
         Navigator.pop(context);

@@ -8,7 +8,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pos_farmacia/core/models/inventario_sucursal_model.dart';
 import 'package:pos_farmacia/core/providers/inventario_sucursal_provider.dart';
 import 'package:pos_farmacia/core/providers/inventario_provider.dart';
-import 'package:pos_farmacia/core/models/product_model.dart';
 import 'package:pos_farmacia/core/services/inventario_sucursal_service.dart';
 import 'package:pos_farmacia/core/providers/user_provider.dart';
 import 'package:pos_farmacia/features/stock/inventario%20por%20sucursal/agregar_producto_sucursal_page.dart';
@@ -58,7 +57,7 @@ class _InventarioSucursalPageState extends State<InventarioSucursalPage> {
           .transform(const CsvToListConverter())
           .toList();
 
-      final provider = Provider.of<InventarioSucursalProvider>(
+      final sucursalProvider = Provider.of<InventarioSucursalProvider>(
         context,
         listen: false,
       );
@@ -78,18 +77,8 @@ class _InventarioSucursalPageState extends State<InventarioSucursalPage> {
           ubicacionFisica: row.length > 10 ? row[10].toString() : '',
           presentacion: row.length > 10 ? row[11].toString() : '',
         );
-        await InventarioSucursalService.insertar(inv);
-      }
 
-      await provider.cargarDesdeBD();
-
-      final productosUnicos = rows
-          .skip(1)
-          .map((row) => int.parse(row[0].toString()))
-          .toSet();
-
-      for (final idProducto in productosUnicos) {
-        await InventarioSucursalService.actualizarStockGlobal(idProducto);
+        await sucursalProvider.agregarRegistro(inv);
       }
 
       await Provider.of<InventarioProvider>(

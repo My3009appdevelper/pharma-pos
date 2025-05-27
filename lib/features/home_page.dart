@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pos_farmacia/features/stock/stock_page.dart';
 import 'package:pos_farmacia/features/sucursal/sucursal_page.dart';
+import 'package:pos_farmacia/features/ventas/historial_ventas_page.dart';
 import 'package:pos_farmacia/features/ventas/ventas_page.dart';
 import 'package:provider/provider.dart';
 import '../core/themes/theme_provider.dart';
@@ -19,6 +20,10 @@ class HomePage extends StatelessWidget {
     final tabs = <Tab>[
       const Tab(text: 'Ventas', icon: Icon(Icons.point_of_sale)),
       const Tab(text: 'Inventario', icon: Icon(Icons.inventory_2)),
+      const Tab(
+        text: 'Historial de Ventas',
+        icon: Icon(Icons.receipt_long_outlined),
+      ),
       const Tab(text: 'Corte de Caja', icon: Icon(Icons.receipt_long)),
       const Tab(text: 'Operaciones', icon: Icon(Icons.settings)),
       const Tab(text: 'Reportes', icon: Icon(Icons.bar_chart)),
@@ -32,6 +37,7 @@ class HomePage extends StatelessWidget {
     final tabViews = <Widget>[
       VentasPage(),
       StockPage(),
+      HistorialVentasPage(),
       const Text('Corte de Caja'),
       const Text('Operaciones'),
       const Text('Reportes'),
