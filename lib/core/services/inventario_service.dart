@@ -36,8 +36,8 @@ class InventarioService {
       'codigo_sat': producto.codigoSAT,
       'presentacion': producto.presentacion,
       'ubicacion_fisica': producto.ubicacionFisica,
-      'productos_relacionados': jsonEncode(producto.productosRelacionados),
-      'comprados_junto_a': jsonEncode(producto.compradosJuntoA),
+      'productos_relacionados': producto.productosRelacionados.join(','),
+      'comprados_junto_a': producto.compradosJuntoA.join(','),
       'activo': producto.activo ? 1 : 0,
       'fecha_creado': DateTime.now().toIso8601String(),
     });
@@ -96,8 +96,8 @@ class InventarioService {
         'codigo_sat': producto.codigoSAT,
         'presentacion': producto.presentacion,
         'ubicacion_fisica': producto.ubicacionFisica,
-        'productos_relacionados': jsonEncode(producto.productosRelacionados),
-        'comprados_junto_a': jsonEncode(producto.compradosJuntoA),
+        'productos_relacionados': producto.productosRelacionados.join(','),
+        'comprados_junto_a': producto.compradosJuntoA.join(','),
         'activo': producto.activo ? 1 : 0,
       },
       where: 'id = ?',
@@ -136,12 +136,14 @@ class InventarioService {
           ? DateTime.parse(row['caducidad'])
           : null,
       imagenUrl: row['imagen_url'],
-      productosRelacionados: List<String>.from(
-        jsonDecode(row['productos_relacionados'] ?? '[]'),
-      ),
-      compradosJuntoA: List<String>.from(
-        jsonDecode(row['comprados_junto_a'] ?? '[]'),
-      ),
+      productosRelacionados: (row['productos_relacionados'] as String)
+          .split(',')
+          .map((e) => e.trim())
+          .toList(),
+      compradosJuntoA: (row['comprados_junto_a'] as String)
+          .split(',')
+          .map((e) => e.trim())
+          .toList(),
       temperaturaMinima: row['temperatura_minima'] as double?,
       temperaturaMaxima: row['temperatura_maxima'] as double?,
       humedadMaxima: row['humedad_maxima'] as double?,

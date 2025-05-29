@@ -21,6 +21,7 @@ class _VentasPageState extends State<VentasPage> {
   final TextEditingController _codigoController = TextEditingController();
   final FocusNode _codigoFocus = FocusNode();
   bool _isLoading = false;
+  ProductoModel? _productoSeleccionado;
 
   @override
   void dispose() {
@@ -40,7 +41,9 @@ class _VentasPageState extends State<VentasPage> {
     );
 
     final producto = inventarioProvider.obtenerPorCodigo(codigo.trim());
-    if (producto != null) {
+    setState(() => _productoSeleccionado = producto);
+
+    if (producto != null && producto.stock > 0) {
       detalleProvider.agregarDetalle(
         DetalleVentaModel(
           uuidVenta: '',
@@ -55,38 +58,34 @@ class _VentasPageState extends State<VentasPage> {
         ),
       );
     } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Producto no encontrado')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Producto no encontrado o sin stock')),
+      );
     }
 
     _codigoController.clear();
-    _codigoFocus.requestFocus(); // <- vuelve a enfocar automáticamente
+    _codigoFocus.requestFocus();
   }
 
   Future<void> procesarPago(BuildContext context) async {
-    setState(() {
-      _isLoading = true;
-    });
-
+    setState(() => _isLoading = true);
     final ventaProvider = Provider.of<VentaProvider>(context, listen: false);
-    final detalleVentaProvider = Provider.of<DetalleVentaProvider>(
+    final detalleProvider = Provider.of<DetalleVentaProvider>(
       context,
       listen: false,
     );
-    final usuarioActual = Provider.of<UserProvider>(
+    final usuario = Provider.of<UserProvider>(
       context,
       listen: false,
     ).usuarioActual;
 
     try {
-      final detalles = detalleVentaProvider.detalles;
+      final detalles = detalleProvider.detalles;
       if (detalles.isEmpty) throw Exception("No hay productos en la venta.");
 
       final now = DateTime.now();
       final uuid = const Uuid().v4();
       final folio = 'FOLIO-${now.microsecondsSinceEpoch}';
-
       final subtotal = detalles.fold(
         0.0,
         (s, d) => s + d.precioUnitario * d.cantidad,
@@ -98,8 +97,8 @@ class _VentasPageState extends State<VentasPage> {
         uuid: uuid,
         folio: folio,
         fecha: now,
-        idSucursal: usuarioActual?.idSucursal ?? 0,
-        idUsuario: usuarioActual?.id ?? 0,
+        idSucursal: usuario?.idSucursal ?? 0,
+        idUsuario: usuario?.id ?? 0,
         total: total,
         subtotal: subtotal,
         descuentoTotal: descuentoTotal,
@@ -110,8 +109,7 @@ class _VentasPageState extends State<VentasPage> {
       );
 
       await ventaProvider.procesarVenta(venta, detalles);
-      detalleVentaProvider.limpiarDetalles();
-
+      detalleProvider.limpiarDetalles();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('✅ Venta registrada correctamente')),
       );
@@ -120,9 +118,28 @@ class _VentasPageState extends State<VentasPage> {
         SnackBar(content: Text('❌ Error al registrar la venta: $e')),
       );
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
+    }
+  }
+
+  List<ProductoModel> _obtenerRelacionados(
+    ProductoModel? base,
+    List<ProductoModel> inventario,
+  ) {
+    if (base == null || base.codigo.isEmpty) return inventario.take(5).toList();
+    if (base.productosRelacionados.isNotEmpty) {
+      return inventario
+          .where((p) => base.productosRelacionados.contains(p.codigo))
+          .toList();
+    } else {
+      return inventario
+          .where(
+            (p) =>
+                p.codigo != base.codigo &&
+                p.categorias.any((cat) => base.categorias.contains(cat)),
+          )
+          .take(5)
+          .toList();
     }
   }
 
@@ -130,70 +147,130 @@ class _VentasPageState extends State<VentasPage> {
   Widget build(BuildContext context) {
     final detalleProvider = Provider.of<DetalleVentaProvider>(context);
     final inventarioProvider = Provider.of<InventarioProvider>(context);
+    final relacionados = _obtenerRelacionados(
+      _productoSeleccionado,
+      inventarioProvider.productos,
+    );
 
     return Scaffold(
-      appBar: AppBar(title: Center(child: Text('Caja registradora'))),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextFormField(
-              controller: _codigoController,
-              focusNode: _codigoFocus,
-              autofocus: true,
-              decoration: const InputDecoration(
-                labelText: 'Escanea o escribe el código...',
-                border: OutlineInputBorder(),
-              ),
-              onFieldSubmitted: (codigo) => _procesarCodigo(context, codigo),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Productos en la venta:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: detalleProvider.detalles.length,
-                itemBuilder: (context, index) {
-                  final d = detalleProvider.detalles[index];
-                  final producto = inventarioProvider.productos.firstWhere(
-                    (p) => p.id == d.idProducto,
-                    orElse: () => ProductoModel.empty(),
-                  );
-                  return ListTile(
-                    title: Text(producto.nombre),
-                    subtitle: Text(
-                      'Cantidad: ${d.cantidad}  Total: \$${d.total.toStringAsFixed(2)}',
+      appBar: AppBar(
+        title: const Text('Caja registradora'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete_forever),
+            tooltip: 'Limpiar venta',
+            onPressed: () {
+              Provider.of<DetalleVentaProvider>(
+                context,
+                listen: false,
+              ).limpiarDetalles();
+            },
+          ),
+        ],
+      ),
+      body: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextFormField(
+                    controller: _codigoController,
+                    focusNode: _codigoFocus,
+                    autofocus: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Escanea o escribe el código...',
+                      border: OutlineInputBorder(),
                     ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () => detalleProvider.eliminarDetalle(d),
-                    ),
-                  );
-                },
-              ),
-            ),
-            const Divider(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Total: \$${detalleProvider.totalVenta.toStringAsFixed(2)}',
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                    onFieldSubmitted: (codigo) =>
+                        _procesarCodigo(context, codigo),
                   ),
-                ),
-                CustomElevatedButton(
-                  onPressed: () => procesarPago(context),
-                  textButtonText: 'Pagar',
-                  loading: _isLoading,
-                ),
-              ],
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Productos en la venta:',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: detalleProvider.detalles.length,
+                      itemBuilder: (context, index) {
+                        final d = detalleProvider.detalles[index];
+                        final producto = inventarioProvider.productos
+                            .firstWhere(
+                              (p) => p.id == d.idProducto,
+                              orElse: () => ProductoModel.empty(),
+                            );
+                        return ListTile(
+                          title: Text(producto.nombre),
+                          subtitle: Text(
+                            'Cantidad: ${d.cantidad}  Total: \$${d.total.toStringAsFixed(2)}',
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () => detalleProvider.eliminarDetalle(d),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const Divider(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Total: \$${detalleProvider.totalVenta.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      CustomElevatedButton(
+                        onPressed: () => procesarPago(context),
+                        textButtonText: 'Pagar',
+                        loading: _isLoading,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
+          ),
+          const VerticalDivider(),
+          Expanded(
+            flex: 1,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Productos relacionados:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: relacionados.length,
+                      itemBuilder: (context, index) {
+                        final p = relacionados[index];
+                        return ListTile(
+                          title: Text(p.nombre),
+                          subtitle: Text(
+                            'Precio: \$${p.precio.toStringAsFixed(2)}',
+                          ),
+                          onTap: () => _procesarCodigo(context, p.codigo),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
