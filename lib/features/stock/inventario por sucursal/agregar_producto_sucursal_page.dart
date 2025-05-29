@@ -285,7 +285,7 @@ class _AgregarProductoSucursalPageState
               CustomElevatedButton(
                 onPressed: _guardar,
                 loading: _loading,
-                child: const Text('Guardar asignación'),
+                textButtonText: 'Guardar asignación',
               ),
             ],
           ),

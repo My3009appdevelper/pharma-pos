@@ -267,7 +267,7 @@ class _AgregarProductoPageState extends State<AgregarProductoPage> {
               CustomElevatedButton(
                 onPressed: _guardarProducto,
                 loading: _loading,
-                child: const Text('Guardar Producto'),
+                textButtonText: 'Guardar Producto',
               ),
             ],
           ),

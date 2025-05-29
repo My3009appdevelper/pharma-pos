@@ -118,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                             }
                           }
                         },
-                        child: const Text('Iniciar Sesión'),
+                        textButtonText: 'Iniciar Sesión',
                       ),
                     ],
                   ),

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pos_farmacia/core/models/product_model.dart';
-import 'package:pos_farmacia/core/models/user_model.dart';
 import 'package:pos_farmacia/core/models/venta_model.dart';
 import 'package:pos_farmacia/core/providers/user_provider.dart';
 import 'package:pos_farmacia/core/providers/venta_provider.dart';
+import 'package:pos_farmacia/widgets/elevated_button.dart';
 import 'package:provider/provider.dart';
 import 'package:pos_farmacia/core/models/detalle_venta_model.dart';
 import 'package:pos_farmacia/core/providers/detalle_venta_provider.dart';
@@ -20,6 +20,7 @@ class VentasPage extends StatefulWidget {
 class _VentasPageState extends State<VentasPage> {
   final TextEditingController _codigoController = TextEditingController();
   final FocusNode _codigoFocus = FocusNode();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -63,58 +64,65 @@ class _VentasPageState extends State<VentasPage> {
     _codigoFocus.requestFocus(); // <- vuelve a enfocar automáticamente
   }
 
-  Future<void> procesarPago({
-    required VentaProvider ventaProvider,
-    required DetalleVentaProvider detalleVentaProvider,
-    required UsuarioModel usuarioActual, // contiene id_usuario y id_sucursal
-    required String metodoPago,
-    required String? observaciones,
-  }) async {
+  Future<void> procesarPago(BuildContext context) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final ventaProvider = Provider.of<VentaProvider>(context, listen: false);
+    final detalleVentaProvider = Provider.of<DetalleVentaProvider>(
+      context,
+      listen: false,
+    );
+    final usuarioActual = Provider.of<UserProvider>(
+      context,
+      listen: false,
+    ).usuarioActual;
+
     try {
       final detalles = detalleVentaProvider.detalles;
       if (detalles.isEmpty) throw Exception("No hay productos en la venta.");
 
       final now = DateTime.now();
-      final uuid = Uuid().v4();
+      final uuid = const Uuid().v4();
       final folio = 'FOLIO-${now.microsecondsSinceEpoch}';
 
-      final double subtotal = detalles.fold(
+      final subtotal = detalles.fold(
         0.0,
         (s, d) => s + d.precioUnitario * d.cantidad,
       );
-      final double descuentoTotal = detalles.fold(
-        0.0,
-        (s, d) => s + d.descuento,
-      );
-      final double total = subtotal - descuentoTotal;
-
-      print('Sucursal de venta: ${usuarioActual.idSucursal}');
+      final descuentoTotal = detalles.fold(0.0, (s, d) => s + d.descuento);
+      final total = subtotal - descuentoTotal;
 
       final venta = VentaModel(
         uuid: uuid,
         folio: folio,
         fecha: now,
-        idSucursal: usuarioActual.idSucursal ?? 0,
-        idUsuario: usuarioActual.id ?? 0,
+        idSucursal: usuarioActual?.idSucursal ?? 0,
+        idUsuario: usuarioActual?.id ?? 0,
         total: total,
         subtotal: subtotal,
         descuentoTotal: descuentoTotal,
-        metodoPago: metodoPago,
-        observaciones: observaciones,
+        metodoPago: 'Efectivo',
+        observaciones: null,
         creadoEn: now,
         sincronizado: 0,
       );
 
       await ventaProvider.procesarVenta(venta, detalles);
-
-      // Opcional: limpiar carrito después de guardar
       detalleVentaProvider.limpiarDetalles();
 
-      // Mostrar mensaje de éxito
-      print('✅ Venta registrada correctamente');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('✅ Venta registrada correctamente')),
+      );
     } catch (e) {
-      print('❌ Error al procesar pago: $e');
-      rethrow;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('❌ Error al registrar la venta: $e')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -124,7 +132,7 @@ class _VentasPageState extends State<VentasPage> {
     final inventarioProvider = Provider.of<InventarioProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Registrar Venta')),
+      appBar: AppBar(title: Center(child: Text('Caja registradora'))),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -177,45 +185,10 @@ class _VentasPageState extends State<VentasPage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                ElevatedButton(
-                  onPressed: () async {
-                    final ventaProvider = Provider.of<VentaProvider>(
-                      context,
-                      listen: false,
-                    );
-                    final detalleVentaProvider =
-                        Provider.of<DetalleVentaProvider>(
-                          context,
-                          listen: false,
-                        );
-                    final usuarioActual = Provider.of<UserProvider>(
-                      context,
-                      listen: false,
-                    ).usuarioActual;
-
-                    try {
-                      await procesarPago(
-                        ventaProvider: ventaProvider,
-                        detalleVentaProvider: detalleVentaProvider,
-                        usuarioActual: usuarioActual!,
-                        metodoPago: 'Efectivo', // o 'Tarjeta', etc.
-                        observaciones: null,
-                      );
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('✅ Venta registrada correctamente'),
-                        ),
-                      );
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('❌ Error al registrar la venta: $e'),
-                        ),
-                      );
-                    }
-                  },
-                  child: Text('Pagar'),
+                CustomElevatedButton(
+                  onPressed: () => procesarPago(context),
+                  textButtonText: 'Pagar',
+                  loading: _isLoading,
                 ),
               ],
             ),

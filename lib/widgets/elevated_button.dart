@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class CustomElevatedButton extends StatelessWidget {
   final VoidCallback? onPressed;
-  final Widget child;
+  final String textButtonText;
   final bool loading;
   final double borderRadius;
   final EdgeInsetsGeometry? padding;
@@ -10,7 +10,7 @@ class CustomElevatedButton extends StatelessWidget {
   const CustomElevatedButton({
     super.key,
     required this.onPressed,
-    required this.child,
+    required this.textButtonText,
     this.loading = false,
     this.borderRadius = 12,
     this.padding,
@@ -38,7 +38,7 @@ class CustomElevatedButton extends StatelessWidget {
               width: 16,
               child: CircularProgressIndicator(strokeWidth: 2),
             )
-          : child,
+          : Text(textButtonText),
     );
   }
 }

@@ -312,7 +312,7 @@ class _EditarProductoPageState extends State<EditarProductoPage> {
               CustomElevatedButton(
                 onPressed: _guardarProducto,
                 loading: _loading,
-                child: const Text('Guardar Cambios'),
+                textButtonText: 'Guardar Cambios',
               ),
             ],
           ),
