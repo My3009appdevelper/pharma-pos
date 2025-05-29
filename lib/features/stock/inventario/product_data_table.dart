@@ -98,7 +98,12 @@ class _ProductDataTableState extends State<ProductDataTable> {
         case 9:
           _ordenar(
             (p) => widget.idSucursalActual == null
-                ? p.stock
+                ? Provider.of<InventarioSucursalProvider>(
+                        context,
+                        listen: false,
+                      ).inventarioCompleto
+                      .where((r) => r.idProducto == p.id)
+                      .fold<int>(0, (sum, r) => sum + r.stock)
                 : Provider.of<InventarioSucursalProvider>(
                         context,
                         listen: false,
@@ -225,7 +230,9 @@ class _ProductDataTableState extends State<ProductDataTable> {
                         numeric: true,
                         onSort: (i, asc) => _ordenar(
                           (p) => widget.idSucursalActual == null
-                              ? p.stock
+                              ? inventarioSucursalProvider.inventarioCompleto
+                                    .where((r) => r.idProducto == p.id)
+                                    .fold<int>(0, (sum, r) => sum + r.stock)
                               : inventarioSucursalProvider.inventario
                                     .where(
                                       (r) =>
@@ -241,7 +248,9 @@ class _ProductDataTableState extends State<ProductDataTable> {
                     ],
                     rows: _productosOrdenados.map((producto) {
                       final stockSucursal = widget.idSucursalActual == null
-                          ? producto.stock
+                          ? inventarioSucursalProvider.inventarioCompleto
+                                .where((r) => r.idProducto == producto.id)
+                                .fold<int>(0, (sum, r) => sum + r.stock)
                           : inventarioSucursalProvider.inventario
                                 .where(
                                   (r) =>

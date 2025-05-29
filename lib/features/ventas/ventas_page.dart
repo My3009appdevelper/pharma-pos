@@ -88,6 +88,8 @@ class _VentasPageState extends State<VentasPage> {
       );
       final double total = subtotal - descuentoTotal;
 
+      print('Sucursal de venta: ${usuarioActual.idSucursal}');
+
       final venta = VentaModel(
         uuid: uuid,
         folio: folio,
