@@ -7,6 +7,7 @@ class DetalleVentaProvider extends ChangeNotifier {
   final DetalleVentaService _service = DetalleVentaService();
 
   List<DetalleVentaModel> get detalles => List.unmodifiable(_detalles);
+  int get totalArticulos => _detalles.fold(0, (suma, d) => suma + d.cantidad);
 
   void cargarDetalles(List<DetalleVentaModel> nuevos) {
     _detalles.clear();

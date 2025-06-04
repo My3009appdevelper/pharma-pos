@@ -24,10 +24,11 @@ class HomePage extends StatelessWidget {
         text: 'Historial de Ventas',
         icon: Icon(Icons.receipt_long_outlined),
       ),
+      const Tab(text: 'Clientes', icon: Icon(Icons.person_search)),
+
       const Tab(text: 'Corte de Caja', icon: Icon(Icons.receipt_long)),
       const Tab(text: 'Operaciones', icon: Icon(Icons.settings)),
       const Tab(text: 'Reportes', icon: Icon(Icons.bar_chart)),
-      const Tab(text: 'Clientes', icon: Icon(Icons.person_search)),
       if (usuario?.rol == 'admin')
         const Tab(text: 'Usuarios', icon: Icon(Icons.people)),
       if (usuario?.rol == 'admin')
@@ -38,10 +39,10 @@ class HomePage extends StatelessWidget {
       VentasPage(),
       StockPage(),
       HistorialVentasPage(),
+      const Text('Clientes'),
       const Text('Corte de Caja'),
       const Text('Operaciones'),
       const Text('Reportes'),
-      const Text('Clientes'),
       if (usuario?.rol == 'admin') const UsuariosPage(),
       if (usuario?.rol == 'admin') const SucursalPage(),
     ];

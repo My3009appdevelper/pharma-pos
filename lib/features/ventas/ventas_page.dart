@@ -22,6 +22,7 @@ class _VentasPageState extends State<VentasPage> {
   final FocusNode _codigoFocus = FocusNode();
   bool _isLoading = false;
   ProductoModel? _productoSeleccionado;
+  String _metodoPagoSeleccionado = 'Efectivo';
 
   @override
   void dispose() {
@@ -102,7 +103,7 @@ class _VentasPageState extends State<VentasPage> {
         total: total,
         subtotal: subtotal,
         descuentoTotal: descuentoTotal,
-        metodoPago: 'Efectivo',
+        metodoPago: _metodoPagoSeleccionado,
         observaciones: null,
         creadoEn: now,
         sincronizado: 0,
@@ -122,35 +123,18 @@ class _VentasPageState extends State<VentasPage> {
     }
   }
 
-  List<ProductoModel> _obtenerRelacionados(
-    ProductoModel? base,
-    List<ProductoModel> inventario,
-  ) {
-    if (base == null || base.codigo.isEmpty) return inventario.take(5).toList();
-    if (base.productosRelacionados.isNotEmpty) {
-      return inventario
-          .where((p) => base.productosRelacionados.contains(p.codigo))
-          .toList();
-    } else {
-      return inventario
-          .where(
-            (p) =>
-                p.codigo != base.codigo &&
-                p.categorias.any((cat) => base.categorias.contains(cat)),
-          )
-          .take(5)
-          .toList();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final detalleProvider = Provider.of<DetalleVentaProvider>(context);
     final inventarioProvider = Provider.of<InventarioProvider>(context);
-    final relacionados = _obtenerRelacionados(
-      _productoSeleccionado,
-      inventarioProvider.productos,
-    );
+    final relacionados = detalleProvider.detalles.isNotEmpty
+        ? inventarioProvider.obtenerRelacionados(
+            inventarioProvider.productos.firstWhere(
+              (p) => p.id == detalleProvider.detalles.last.idProducto,
+              orElse: () => ProductoModel.empty(),
+            ),
+          )
+        : inventarioProvider.productos.take(5).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -220,12 +204,41 @@ class _VentasPageState extends State<VentasPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'Total: \$${detalleProvider.totalVenta.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Column(
+                        children: [
+                          Text(
+                            'Artículos: ${detalleProvider.totalArticulos}',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Total: \$${detalleProvider.totalVenta.toStringAsFixed(2)}',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      DropdownButton<String>(
+                        value: _metodoPagoSeleccionado,
+                        onChanged: (value) {
+                          if (value != null) {
+                            setState(() => _metodoPagoSeleccionado = value);
+                          }
+                        },
+                        items: ['Efectivo', 'Tarjeta', 'Transferencia'].map((
+                          m,
+                        ) {
+                          return DropdownMenuItem<String>(
+                            value: m,
+                            child: Text(m),
+                          );
+                        }).toList(),
                       ),
                       CustomElevatedButton(
                         onPressed: () => procesarPago(context),
