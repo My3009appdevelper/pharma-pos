@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pos_farmacia/core/database/database_service.dart';
 import 'package:pos_farmacia/core/models/venta_model.dart';
-import 'package:pos_farmacia/core/models/detalle_venta_model.dart';
+import 'package:pos_farmacia/core/models/venta_detalle_model.dart';
 import 'package:pos_farmacia/core/services/inventario_service.dart';
 import 'package:pos_farmacia/core/services/inventario_sucursal_service.dart';
 import 'package:pos_farmacia/core/services/venta_service.dart';

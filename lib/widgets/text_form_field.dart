@@ -8,6 +8,7 @@ class CustomTextFormField extends StatelessWidget {
   final TextInputType? keyboardType;
   final Widget? prefixIcon;
   final bool enabled;
+  final int maxLines;
 
   const CustomTextFormField({
     super.key,
@@ -18,6 +19,7 @@ class CustomTextFormField extends StatelessWidget {
     this.keyboardType,
     this.prefixIcon,
     this.enabled = true,
+    this.maxLines = 1,
   });
 
   @override
@@ -29,6 +31,7 @@ class CustomTextFormField extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: TextFormField(
+        maxLines: maxLines,
         controller: controller,
         validator: validator,
         obscureText: obscureText,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pos_farmacia/core/models/detalle_venta_model.dart';
+import 'package:pos_farmacia/core/models/venta_detalle_model.dart';
 import 'package:pos_farmacia/core/services/detalle_venta_service.dart';
 
 class DetalleVentaProvider extends ChangeNotifier {

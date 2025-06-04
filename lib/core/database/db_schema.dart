@@ -157,4 +157,36 @@ class DBSchema {
     FOREIGN KEY(id_producto) REFERENCES sucursales(id)
   );
 ''';
+
+  static const String createRecetas = '''
+  CREATE TABLE IF NOT EXISTS recetas (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    uuid TEXT UNIQUE,
+    uuid_venta TEXT,
+    nombre_paciente TEXT,
+    nombre_medico TEXT,
+    cedula_profesional TEXT,
+    observaciones TEXT,
+    fecha_emision TEXT,
+    creado_en TEXT,
+    modificado_en TEXT,
+    sincronizado INTEGER DEFAULT 0,
+    FOREIGN KEY(uuid_venta) REFERENCES ventas(uuid)
+  );
+''';
+
+  static const String createRecetaDetalle = '''
+  CREATE TABLE IF NOT EXISTS receta_detalle (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    uuid_receta TEXT,
+    id_producto INTEGER,
+    cantidad INTEGER,
+    indicaciones TEXT,
+    creado_en TEXT,
+    modificado_en TEXT,
+    sincronizado INTEGER DEFAULT 0,
+    FOREIGN KEY(uuid_receta) REFERENCES recetas(uuid),
+    FOREIGN KEY(id_producto) REFERENCES productos(id)
+  );
+''';
 }

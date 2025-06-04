@@ -1,7 +1,7 @@
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import '../database/database_service.dart';
 import '../models/venta_model.dart';
-import '../models/detalle_venta_model.dart';
+import '../models/venta_detalle_model.dart';
 
 class VentaService {
   Future<int> insertarVenta(

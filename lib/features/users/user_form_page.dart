@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pos_farmacia/core/providers/sucursal_provider.dart';
+import 'package:pos_farmacia/widgets/elevated_button.dart';
+import 'package:pos_farmacia/widgets/text_form_field.dart';
 import 'package:provider/provider.dart';
 import '../../core/models/user_model.dart';
 import '../../core/providers/user_provider.dart';
@@ -54,20 +56,20 @@ class _UserFormPageState extends State<UserFormPage> {
           key: _formKey,
           child: ListView(
             children: [
-              TextFormField(
+              CustomTextFormField(
+                label: 'Nombre completo',
                 controller: _nombreCtrl,
-                decoration: const InputDecoration(labelText: 'Nombre completo'),
                 validator: (v) => v == null || v.isEmpty ? 'Requerido' : null,
               ),
-              TextFormField(
+              CustomTextFormField(
+                label: 'Usuario',
                 controller: _usuarioCtrl,
-                decoration: const InputDecoration(labelText: 'Usuario'),
                 validator: (v) => v == null || v.isEmpty ? 'Requerido' : null,
               ),
               if (widget.usuario == null)
-                TextFormField(
+                CustomTextFormField(
+                  label: 'Contraseña',
                   controller: _passwordCtrl,
-                  decoration: const InputDecoration(labelText: 'Contraseña'),
                   obscureText: true,
                   validator: (v) => v == null || v.isEmpty ? 'Requerida' : null,
                 ),
@@ -100,8 +102,8 @@ class _UserFormPageState extends State<UserFormPage> {
                     : null,
               ),
               const SizedBox(height: 24),
-              ElevatedButton(
-                child: const Text('Guardar'),
+              CustomElevatedButton(
+                textButtonText: 'Guardar',
                 onPressed: () async {
                   if (_formKey.currentState?.validate() ?? false) {
                     final usuario = UsuarioModel(

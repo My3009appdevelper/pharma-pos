@@ -136,6 +136,14 @@ class InventarioProvider extends ChangeNotifier {
     }
   }
 
+  ProductoModel? obtenerPorId(int id) {
+    try {
+      return _productos.firstWhere((p) => p.id == id);
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<void> cargarDesdeBD() async {
     final lista = await InventarioService.obtenerTodosLosProductos();
     cargarDesdeBaseDeDatos(lista);

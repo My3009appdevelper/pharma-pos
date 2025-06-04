@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pos_farmacia/core/database/database_service.dart';
 import 'package:pos_farmacia/core/providers/detalle_venta_provider.dart';
+import 'package:pos_farmacia/core/providers/receta_provider.dart';
 import 'package:pos_farmacia/core/providers/venta_provider.dart';
 import 'package:pos_farmacia/core/themes/dark_mode.dart';
 import 'package:pos_farmacia/core/themes/light_mode.dart';
@@ -36,6 +37,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => InventarioSucursalProvider()),
         ChangeNotifierProvider(create: (_) => VentaProvider()),
         ChangeNotifierProvider(create: (_) => DetalleVentaProvider()),
+        ChangeNotifierProvider(create: (_) => RecetaProvider()),
       ],
       child: const MyApp(),
     ),

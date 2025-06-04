@@ -1,12 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:pos_farmacia/core/models/product_model.dart';
 import 'package:pos_farmacia/core/models/venta_model.dart';
 import 'package:pos_farmacia/core/providers/user_provider.dart';
 import 'package:pos_farmacia/core/providers/venta_provider.dart';
 import 'package:pos_farmacia/features/ventas/buscar_producto_widget.dart';
+import 'package:pos_farmacia/features/ventas/receta_form_page.dart';
 import 'package:pos_farmacia/widgets/elevated_button.dart';
 import 'package:provider/provider.dart';
-import 'package:pos_farmacia/core/models/detalle_venta_model.dart';
+import 'package:pos_farmacia/core/models/venta_detalle_model.dart';
 import 'package:pos_farmacia/core/providers/detalle_venta_provider.dart';
 import 'package:pos_farmacia/core/providers/inventario_provider.dart';
 import 'package:uuid/uuid.dart';
@@ -24,6 +27,7 @@ class _VentasPageState extends State<VentasPage> {
   bool _isLoading = false;
   ProductoModel? _productoSeleccionado;
   String _metodoPagoSeleccionado = 'Efectivo';
+  String? _uuidVenta;
 
   @override
   void initState() {
@@ -41,6 +45,64 @@ class _VentasPageState extends State<VentasPage> {
     _codigoController.dispose();
     _codigoFocus.dispose();
     super.dispose();
+  }
+
+  bool _hayProductosConReceta(BuildContext context) {
+    final detalleProvider = Provider.of<DetalleVentaProvider>(
+      context,
+      listen: false,
+    );
+    return detalleProvider.detalles.any(
+      (d) => Provider.of<InventarioProvider>(
+        context,
+        listen: false,
+      ).productos.firstWhere((p) => p.id == d.idProducto).requiereReceta,
+    );
+  }
+
+  Future<void> _mostrarDialogoCapturaReceta(BuildContext context) async {
+    final uuidVenta = const Uuid().v4(); // Genera uuid
+    _uuidVenta = uuidVenta; // Guarda en el estado
+
+    final continuar = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("📋 Receta médica requerida"),
+        content: const Text(
+          "Algunos productos requieren receta médica. ¿Deseas capturarla antes de continuar con el pago?",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text("Cancelar"),
+          ),
+          CustomElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            textButtonText: "Capturar receta",
+          ),
+        ],
+      ),
+    );
+
+    if (continuar == true) {
+      await showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        builder: (context) => Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.9,
+            child: RecetaFormPage(uuidVenta: uuidVenta),
+          ),
+        ),
+      );
+    }
   }
 
   void _procesarCodigo(BuildContext context, String codigo) {
@@ -82,6 +144,12 @@ class _VentasPageState extends State<VentasPage> {
 
   Future<void> procesarPago(BuildContext context) async {
     setState(() => _isLoading = true);
+
+    if (_hayProductosConReceta(context)) {
+      await _mostrarDialogoCapturaReceta(context);
+      return; // Detener flujo hasta que regrese
+    }
+
     final ventaProvider = Provider.of<VentaProvider>(context, listen: false);
     final detalleProvider = Provider.of<DetalleVentaProvider>(
       context,
@@ -97,7 +165,8 @@ class _VentasPageState extends State<VentasPage> {
       if (detalles.isEmpty) throw Exception("No hay productos en la venta.");
 
       final now = DateTime.now();
-      final uuid = const Uuid().v4();
+      final uuid =
+          _uuidVenta ?? const Uuid().v4(); // Usa receta o crea uno nuevo
       final folio = 'FOLIO-${now.microsecondsSinceEpoch}';
       final subtotal = detalles.fold(
         0.0,
@@ -123,6 +192,8 @@ class _VentasPageState extends State<VentasPage> {
 
       await ventaProvider.procesarVenta(venta, detalles);
       detalleProvider.limpiarDetalles();
+      _uuidVenta = null; // Limpia después de usarla
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('✅ Venta registrada correctamente')),
       );
@@ -199,7 +270,7 @@ class _VentasPageState extends State<VentasPage> {
                   ),
                   const SizedBox(height: 20),
                   const Text(
-                    'Productos en la venta:',
+                    'Productos en la caja:',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   Expanded(
@@ -213,6 +284,20 @@ class _VentasPageState extends State<VentasPage> {
                               orElse: () => ProductoModel.empty(),
                             );
                         return ListTile(
+                          leading:
+                              producto.imagenUrl != null &&
+                                  File(producto.imagenUrl!).existsSync()
+                              ? Image.file(
+                                  File(producto.imagenUrl!),
+                                  width: 40,
+                                  height: 40,
+                                  fit: BoxFit.cover,
+                                )
+                              : const Icon(
+                                  Icons.image,
+                                  size: 30,
+                                  color: Colors.grey,
+                                ),
                           title: Text(producto.nombre),
                           subtitle: Text(
                             'Cantidad: ${d.cantidad}  Total: \$${d.total.toStringAsFixed(2)}',
@@ -302,6 +387,20 @@ class _VentasPageState extends State<VentasPage> {
                           itemBuilder: (context, index) {
                             final p = relacionados[index];
                             return ListTile(
+                              leading:
+                                  p.imagenUrl != null &&
+                                      File(p.imagenUrl!).existsSync()
+                                  ? Image.file(
+                                      File(p.imagenUrl!),
+                                      width: 40,
+                                      height: 40,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : const Icon(
+                                      Icons.image,
+                                      size: 30,
+                                      color: Colors.grey,
+                                    ),
                               title: Text(p.nombre),
                               subtitle: Text(
                                 'Precio: \$${p.precio.toStringAsFixed(2)}',
@@ -315,6 +414,20 @@ class _VentasPageState extends State<VentasPage> {
                           itemBuilder: (context, index) {
                             final p = compradosJuntoA[index];
                             return ListTile(
+                              leading:
+                                  p.imagenUrl != null &&
+                                      File(p.imagenUrl!).existsSync()
+                                  ? Image.file(
+                                      File(p.imagenUrl!),
+                                      width: 40,
+                                      height: 40,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : const Icon(
+                                      Icons.image,
+                                      size: 30,
+                                      color: Colors.grey,
+                                    ),
                               title: Text(p.nombre),
                               subtitle: Text(
                                 'Precio: \$${p.precio.toStringAsFixed(2)}',
