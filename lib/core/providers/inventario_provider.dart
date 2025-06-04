@@ -116,6 +116,26 @@ class InventarioProvider extends ChangeNotifier {
     }
   }
 
+  // Obtener productos comprados junto a
+  List<ProductoModel> obtenerCompradosJuntoA(ProductoModel? base) {
+    if (base == null || base.codigo.isEmpty) return _productos.take(5).toList();
+
+    if (base.compradosJuntoA.isNotEmpty) {
+      return _productos
+          .where((p) => base.compradosJuntoA.contains(p.codigo))
+          .toList();
+    } else {
+      return _productos
+          .where(
+            (p) =>
+                p.codigo != base.codigo &&
+                p.categorias.any((cat) => base.categorias.contains(cat)),
+          )
+          .take(5)
+          .toList();
+    }
+  }
+
   Future<void> cargarDesdeBD() async {
     final lista = await InventarioService.obtenerTodosLosProductos();
     cargarDesdeBaseDeDatos(lista);

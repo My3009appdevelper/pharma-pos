@@ -3,6 +3,7 @@ import 'package:pos_farmacia/core/models/product_model.dart';
 import 'package:pos_farmacia/core/models/venta_model.dart';
 import 'package:pos_farmacia/core/providers/user_provider.dart';
 import 'package:pos_farmacia/core/providers/venta_provider.dart';
+import 'package:pos_farmacia/features/ventas/buscar_producto_widget.dart';
 import 'package:pos_farmacia/widgets/elevated_button.dart';
 import 'package:provider/provider.dart';
 import 'package:pos_farmacia/core/models/detalle_venta_model.dart';
@@ -23,6 +24,17 @@ class _VentasPageState extends State<VentasPage> {
   bool _isLoading = false;
   ProductoModel? _productoSeleccionado;
   String _metodoPagoSeleccionado = 'Efectivo';
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<DetalleVentaProvider>(
+        context,
+        listen: false,
+      ).limpiarDetalles();
+    });
+  }
 
   @override
   void dispose() {
@@ -125,10 +137,23 @@ class _VentasPageState extends State<VentasPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
     final detalleProvider = Provider.of<DetalleVentaProvider>(context);
     final inventarioProvider = Provider.of<InventarioProvider>(context);
     final relacionados = detalleProvider.detalles.isNotEmpty
         ? inventarioProvider.obtenerRelacionados(
+            inventarioProvider.productos.firstWhere(
+              (p) => p.id == detalleProvider.detalles.last.idProducto,
+              orElse: () => ProductoModel.empty(),
+            ),
+          )
+        : inventarioProvider.productos.take(5).toList();
+
+    final compradosJuntoA = detalleProvider.detalles.isNotEmpty
+        ? inventarioProvider.obtenerCompradosJuntoA(
             inventarioProvider.productos.firstWhere(
               (p) => p.id == detalleProvider.detalles.last.idProducto,
               orElse: () => ProductoModel.empty(),
@@ -254,29 +279,60 @@ class _VentasPageState extends State<VentasPage> {
           const VerticalDivider(),
           Expanded(
             flex: 1,
-            child: Padding(
-              padding: const EdgeInsets.all(16),
+            child: DefaultTabController(
+              length: 3,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Productos relacionados:',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  TabBar(
+                    labelColor: colorScheme.primary,
+                    unselectedLabelColor: colorScheme.primary.withOpacity(0.6),
+                    tabs: [
+                      Tab(text: 'Relacionados'),
+                      Tab(text: 'Comprados junto a'),
+                      Tab(text: 'Buscar'),
+                    ],
                   ),
                   const SizedBox(height: 8),
                   Expanded(
-                    child: ListView.builder(
-                      itemCount: relacionados.length,
-                      itemBuilder: (context, index) {
-                        final p = relacionados[index];
-                        return ListTile(
-                          title: Text(p.nombre),
-                          subtitle: Text(
-                            'Precio: \$${p.precio.toStringAsFixed(2)}',
+                    child: TabBarView(
+                      children: [
+                        ListView.builder(
+                          itemCount: relacionados.length,
+                          itemBuilder: (context, index) {
+                            final p = relacionados[index];
+                            return ListTile(
+                              title: Text(p.nombre),
+                              subtitle: Text(
+                                'Precio: \$${p.precio.toStringAsFixed(2)}',
+                              ),
+                              onTap: () => _procesarCodigo(context, p.codigo),
+                            );
+                          },
+                        ),
+                        ListView.builder(
+                          itemCount: compradosJuntoA.length,
+                          itemBuilder: (context, index) {
+                            final p = compradosJuntoA[index];
+                            return ListTile(
+                              title: Text(p.nombre),
+                              subtitle: Text(
+                                'Precio: \$${p.precio.toStringAsFixed(2)}',
+                              ),
+                              onTap: () => _procesarCodigo(context, p.codigo),
+                            );
+                          },
+                        ),
+                        // Tab 3: Buscar Producto
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: BuscarProductoWidget(
+                            productos: inventarioProvider.productos,
+                            onSeleccionar: (p) =>
+                                _procesarCodigo(context, p.codigo),
                           ),
-                          onTap: () => _procesarCodigo(context, p.codigo),
-                        );
-                      },
+                        ),
+                      ],
                     ),
                   ),
                 ],
