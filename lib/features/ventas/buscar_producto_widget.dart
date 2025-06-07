@@ -43,7 +43,7 @@ class BuscarProductoWidgetState extends State<BuscarProductoWidget> {
               return ListTile(
                 title: Text(p.nombre),
                 subtitle: Text('Precio: \$${p.precio.toStringAsFixed(2)}'),
-                trailing: const Icon(Icons.add),
+
                 onTap: () => widget.onSeleccionar(p),
               );
             },
