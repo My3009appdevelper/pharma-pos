@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:pos_farmacia/widgets/custom_snackbar.dart';
 
 class ImagePickerField extends StatelessWidget {
   final String? initialUrl;
@@ -21,8 +22,10 @@ class ImagePickerField extends StatelessWidget {
     if (result != null && result.files.single.path != null) {
       onImageSelected(result.files.single.path!);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No se seleccionó ninguna imagen.')),
+      SnackBarUtils.show(
+        context,
+        message: 'No se seleccionó ninguna imagen.',
+        type: SnackBarType.error,
       );
     }
   }

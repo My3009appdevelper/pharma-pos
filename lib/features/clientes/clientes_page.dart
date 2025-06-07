@@ -4,9 +4,12 @@ import 'dart:io';
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pos_farmacia/core/models/cliente_model.dart';
 import 'package:pos_farmacia/core/providers/cliente_provider.dart';
 import 'package:pos_farmacia/core/services/cliente_service.dart';
+import 'package:pos_farmacia/features/clientes/cliente_form_page.dart';
+import 'package:pos_farmacia/features/clientes/clientes_data_table.dart';
 import 'package:provider/provider.dart';
 
 class ClientesPage extends StatefulWidget {
@@ -76,31 +79,7 @@ class _ClientesPageState extends State<ClientesPage> {
               },
             ),
           ),
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: DataTable(
-                columns: const [
-                  DataColumn(label: Text('Nombre')),
-                  DataColumn(label: Text('Teléfono')),
-                  DataColumn(label: Text('Email')),
-                  DataColumn(label: Text('RFC')),
-                  DataColumn(label: Text('Puntos')),
-                ],
-                rows: clientesFiltrados.map((ClienteModel cliente) {
-                  return DataRow(
-                    cells: [
-                      DataCell(Text(cliente.nombreCompleto)),
-                      DataCell(Text(cliente.telefono ?? '')),
-                      DataCell(Text(cliente.email ?? '')),
-                      DataCell(Text(cliente.rfc ?? '')),
-                      DataCell(Text(cliente.puntosAcumulados.toString())),
-                    ],
-                  );
-                }).toList(),
-              ),
-            ),
-          ),
+          Expanded(child: ClientesDataTable(clientes: clientesFiltrados)),
         ],
       ),
     );
@@ -194,13 +173,78 @@ class _ClientesPageState extends State<ClientesPage> {
     }
   }
 
-  void _exportarClientesCSV() {
-    // TODO: Implementar exportación de CSV
-    debugPrint("Exportar CSV presionado");
+  Future<void> _exportarClientesCSV() async {
+    final clientes = Provider.of<ClienteProvider>(
+      context,
+      listen: false,
+    ).clientes;
+
+    final List<List<String>> rows = [
+      [
+        'uuid_cliente',
+        'nombreCompleto',
+        'apellido',
+        'telefono',
+        'email',
+        'direccion',
+        'ciudad',
+        'estado',
+        'codigo_postal',
+        'creadoEn',
+        'modificadoEn',
+        'rfc',
+        'razonSocial',
+        'usoCfdi',
+        'regimenFiscal',
+        'puntosAcumulados',
+      ],
+      ...clientes.map(
+        (c) => [
+          c.uuidCliente,
+          c.nombreCompleto,
+          c.apellido ?? '',
+          c.telefono ?? '',
+          c.email ?? '',
+          c.direccion ?? '',
+          c.ciudad ?? '',
+          c.estado ?? '',
+          c.codigoPostal ?? '',
+          c.creadoEn.toIso8601String(),
+          c.modificadoEn.toIso8601String(),
+          c.rfc ?? '',
+          c.razonSocial ?? '',
+          c.usoCfdi ?? '',
+          c.regimenFiscal ?? '',
+          c.puntosAcumulados.toString(),
+        ],
+      ),
+    ];
+
+    final csv = const ListToCsvConverter().convert(rows);
+    final dir = await getApplicationDocumentsDirectory();
+    final file = File('${dir.path}/clientes_exportados.csv');
+
+    await file.writeAsString(csv, encoding: const Utf8Codec());
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('✅ Clientes exportados a:\n${file.path}')),
+    );
   }
 
   void _mostrarFormularioCliente() {
-    // TODO: Navegar o mostrar formulario modal para agregar cliente
-    debugPrint("Agregar cliente presionado");
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: const ClienteFormPage(),
+      ),
+    );
   }
 }

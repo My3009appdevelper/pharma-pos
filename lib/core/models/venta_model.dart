@@ -5,7 +5,7 @@ class VentaModel {
   final DateTime fecha;
   final int idSucursal;
   final int idUsuario;
-  final int? idCliente;
+  final String? uuid_cliente;
   final double total;
   final double subtotal;
   final double descuentoTotal;
@@ -22,7 +22,7 @@ class VentaModel {
     required this.fecha,
     required this.idSucursal,
     required this.idUsuario,
-    this.idCliente,
+    this.uuid_cliente,
     required this.total,
     required this.subtotal,
     required this.descuentoTotal,
@@ -39,7 +39,7 @@ class VentaModel {
     'fecha': fecha.toIso8601String(),
     'id_sucursal': idSucursal,
     'id_usuario': idUsuario,
-    'id_cliente': idCliente,
+    'uuid_cliente': uuid_cliente,
     'total': total,
     'subtotal': subtotal,
     'descuento_total': descuentoTotal,
@@ -57,7 +57,7 @@ class VentaModel {
     fecha: DateTime.parse(map['fecha']),
     idSucursal: map['id_sucursal'],
     idUsuario: map['id_usuario'],
-    idCliente: map['id_cliente'],
+    uuid_cliente: map['uuid_cliente'],
     total: map['total'],
     subtotal: map['subtotal'],
     descuentoTotal: map['descuento_total'],

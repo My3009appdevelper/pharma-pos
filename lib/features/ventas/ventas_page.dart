@@ -7,6 +7,7 @@ import 'package:pos_farmacia/core/providers/user_provider.dart';
 import 'package:pos_farmacia/core/providers/venta_provider.dart';
 import 'package:pos_farmacia/features/ventas/buscar_producto_widget.dart';
 import 'package:pos_farmacia/features/ventas/receta_form_page.dart';
+import 'package:pos_farmacia/widgets/custom_snackbar.dart';
 import 'package:pos_farmacia/widgets/elevated_button.dart';
 import 'package:provider/provider.dart';
 import 'package:pos_farmacia/core/models/venta_detalle_model.dart';
@@ -133,8 +134,10 @@ class _VentasPageState extends State<VentasPage> {
         ),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Producto no encontrado o sin stock')),
+      SnackBarUtils.show(
+        context,
+        message: 'Producto no encontrado o sin stock',
+        type: SnackBarType.warning,
       );
     }
 
@@ -194,13 +197,14 @@ class _VentasPageState extends State<VentasPage> {
       detalleProvider.limpiarDetalles();
       _uuidVenta = null; // Limpia después de usarla
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('✅ Venta registrada correctamente')),
+      SnackBarUtils.show(
+        context,
+        message: '✅ Venta registrada correctamente',
+        type: SnackBarType.success,
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('❌ Error al registrar la venta: $e')),
-      );
+      SnackBarUtils.show(context, message: '❌ $e', type: SnackBarType.error);
+      print(e);
     } finally {
       setState(() => _isLoading = false);
     }
