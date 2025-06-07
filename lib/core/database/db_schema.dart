@@ -70,6 +70,29 @@ class DBSchema {
       fecha TEXT
     );
   ''';
+
+  static const String createClientes = '''
+    CREATE TABLE IF NOT EXISTS clientes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      uuid_cliente TEXT UNIQUE,
+      nombreCompleto TEXT NOT NULL,
+      apellido TEXT,
+      telefono TEXT,
+      email TEXT,
+      direccion TEXT,
+      ciudad TEXT,
+      estado TEXT,
+      codigo_postal TEXT,
+      creadoEn TEXT,
+      modificadoEn TEXT,
+      rfc TEXT,
+      razonSocial TEXT,
+      usoCfdi TEXT,
+      regimenFiscal TEXT,
+      puntosAcumulados INTEGER DEFAULT 0
+    );
+  ''';
+
   static const String createSucursales = '''
     CREATE TABLE IF NOT EXISTS sucursales (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -80,6 +103,7 @@ class DBSchema {
       estado TEXT
     );
   ''';
+
   static const String createInventarioSucursal = '''
   CREATE TABLE IF NOT EXISTS inventario_sucursal (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -125,7 +149,7 @@ class DBSchema {
     fecha TEXT,
     id_usuario INTEGER,
     id_sucursal INTEGER,
-    id_cliente INTEGER,
+    uuid_cliente TEXT,
     total REAL,
     subtotal REAL,
     descuento_total REAL,
@@ -134,8 +158,9 @@ class DBSchema {
     modificado_en TEXT,
     observaciones TEXT,
     sincronizado INTEGER DEFAULT 0,
-    FOREIGN KEY(id_usuario) REFERENCES usuarios(id),
-    FOREIGN KEY(id_sucursal) REFERENCES sucursales(id)
+    FOREIGN KEY(id_usuario) REFERENCES usuarios(id) ON DELETE SET NULL,
+    FOREIGN KEY(id_sucursal) REFERENCES sucursales(id) ON DELETE SET NULL,
+    FOREIGN KEY(uuid_cliente) REFERENCES clientes(uuid_cliente) ON DELETE SET NULL
   );
 ''';
 
@@ -153,7 +178,7 @@ class DBSchema {
     modificado_en TEXT,
     sincronizado INTEGER DEFAULT 0,
     FOREIGN KEY(uuid_venta) REFERENCES ventas(uuid),
-    FOREIGN KEY(id_producto) REFERENCES productos(id)
+    FOREIGN KEY(id_producto) REFERENCES productos(id),
     FOREIGN KEY(id_producto) REFERENCES sucursales(id)
   );
 ''';
@@ -163,6 +188,7 @@ class DBSchema {
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     uuid TEXT UNIQUE,
     uuid_venta TEXT,
+    uuid_cliente TEXT,
     nombre_paciente TEXT,
     nombre_medico TEXT,
     cedula_profesional TEXT,
@@ -171,7 +197,8 @@ class DBSchema {
     creado_en TEXT,
     modificado_en TEXT,
     sincronizado INTEGER DEFAULT 0,
-    FOREIGN KEY(uuid_venta) REFERENCES ventas(uuid)
+    FOREIGN KEY(uuid_venta) REFERENCES ventas(uuid),
+    FOREIGN KEY(uuid_cliente) REFERENCES clientes(uuid_cliente)
   );
 ''';
 

@@ -44,6 +44,7 @@ class DatabaseService {
     await db.execute(DBSchema.createLotesProducto);
     await db.execute(DBSchema.createRecetas);
     await db.execute(DBSchema.createRecetaDetalle);
+    await db.execute(DBSchema.createClientes);
   }
 
   static Future<void> borrarBaseDeDatos() async {

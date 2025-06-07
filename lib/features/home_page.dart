@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pos_farmacia/features/clientes/clientes_page.dart';
 import 'package:pos_farmacia/features/stock/stock_page.dart';
 import 'package:pos_farmacia/features/sucursal/sucursal_page.dart';
 import 'package:pos_farmacia/features/ventas/historial_ventas_page.dart';
@@ -39,7 +40,7 @@ class HomePage extends StatelessWidget {
       VentasPage(),
       StockPage(),
       HistorialVentasPage(),
-      const Text('Clientes'),
+      ClientesPage(),
       const Text('Corte de Caja'),
       const Text('Operaciones'),
       const Text('Reportes'),
