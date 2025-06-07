@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pos_farmacia/widgets/custom_snackbar.dart';
 import 'package:provider/provider.dart';
 import 'package:pos_farmacia/core/providers/inventario_provider.dart';
 import 'package:pos_farmacia/core/providers/sucursal_provider.dart';
@@ -115,8 +116,10 @@ class _AgregarProductoSucursalPageState
 
     if (context.mounted) {
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Producto asignado a sucursal')),
+      SnackBarUtils.show(
+        context,
+        message: 'Producto asignado a sucursal',
+        type: SnackBarType.success,
       );
     }
   }

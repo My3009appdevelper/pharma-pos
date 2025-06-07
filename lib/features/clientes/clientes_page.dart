@@ -10,6 +10,7 @@ import 'package:pos_farmacia/core/providers/cliente_provider.dart';
 import 'package:pos_farmacia/core/services/cliente_service.dart';
 import 'package:pos_farmacia/features/clientes/cliente_form_page.dart';
 import 'package:pos_farmacia/features/clientes/clientes_data_table.dart';
+import 'package:pos_farmacia/widgets/custom_snackbar.dart';
 import 'package:provider/provider.dart';
 
 class ClientesPage extends StatefulWidget {
@@ -107,13 +108,11 @@ class _ClientesPageState extends State<ClientesPage> {
       } catch (e) {
         debugPrint('❌ Error al leer o parsear el CSV: $e');
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
+          SnackBarUtils.show(
+            context,
+            message:
                 '⚠️ No se pudo leer el archivo CSV.\nAsegúrate de que esté en formato UTF-8 y con la estructura correcta.',
-              ),
-              duration: Duration(seconds: 5),
-            ),
+            type: SnackBarType.error,
           );
         }
         return;
@@ -162,13 +161,11 @@ class _ClientesPageState extends State<ClientesPage> {
 
       await provider.cargarClientes();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
+      SnackBarUtils.show(
+        context,
+        message:
             '✅ Importación completada.\nClientes agregados: $agregados\nDuplicados ignorados: $duplicados',
-          ),
-          duration: const Duration(seconds: 4),
-        ),
+        type: SnackBarType.success,
       );
     }
   }
@@ -226,8 +223,10 @@ class _ClientesPageState extends State<ClientesPage> {
 
     await file.writeAsString(csv, encoding: const Utf8Codec());
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('✅ Clientes exportados a:\n${file.path}')),
+    SnackBarUtils.show(
+      context,
+      message: '✅ Clientes exportados a:\n${file.path}',
+      type: SnackBarType.success,
     );
   }
 

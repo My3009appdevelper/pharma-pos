@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pos_farmacia/widgets/custom_snackbar.dart';
 import 'dart:io';
 import 'package:pos_farmacia/widgets/elevated_button.dart';
 import 'package:pos_farmacia/widgets/text_form_field.dart';
@@ -117,12 +118,10 @@ class _EditarProductoPageState extends State<EditarProductoPage> {
 
       if (yaExiste) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                '❌ Ya existe un producto con ese código, intente con otro',
-              ),
-            ),
+          SnackBarUtils.show(
+            context,
+            message: '❌ Ya existe un producto con ese código, intente con otro',
+            type: SnackBarType.error,
           );
         }
         return;
@@ -135,14 +134,18 @@ class _EditarProductoPageState extends State<EditarProductoPage> {
 
       if (context.mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(
+        SnackBarUtils.show(
           context,
-        ).showSnackBar(const SnackBar(content: Text('✅ Producto actualizado')));
+          message: 'Producto actualizado',
+          type: SnackBarType.success,
+        );
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('⚠️ Error al actualizar: ${e.toString()}')),
+        SnackBarUtils.show(
+          context,
+          message: '⚠️ Error al actualizar: ${e.toString()}',
+          type: SnackBarType.warning,
         );
       }
     } finally {

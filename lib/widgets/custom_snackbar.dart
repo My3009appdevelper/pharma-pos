@@ -7,7 +7,7 @@ class SnackBarUtils {
     BuildContext context, {
     required String message,
     SnackBarType type = SnackBarType.info,
-    Duration duration = const Duration(seconds: 3),
+    Duration duration = const Duration(seconds: 2),
   }) {
     Color backgroundColor;
 

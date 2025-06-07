@@ -12,6 +12,7 @@ import 'package:pos_farmacia/core/services/inventario_sucursal_service.dart';
 import 'package:pos_farmacia/core/providers/user_provider.dart';
 import 'package:pos_farmacia/features/stock/inventario%20por%20sucursal/agregar_producto_sucursal_page.dart';
 import 'package:pos_farmacia/features/stock/inventario%20por%20sucursal/inventario_sucursal_table.dart';
+import 'package:pos_farmacia/widgets/custom_snackbar.dart';
 import 'package:pos_farmacia/widgets/navigation_rail_categories.dart';
 import 'package:provider/provider.dart';
 
@@ -86,8 +87,10 @@ class _InventarioSucursalPageState extends State<InventarioSucursalPage> {
         listen: false,
       ).cargarDesdeBD();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Inventario por sucursal importado')),
+      SnackBarUtils.show(
+        context,
+        message: 'Inventario por sucursal importado',
+        type: SnackBarType.success,
       );
     }
   }
@@ -130,8 +133,10 @@ class _InventarioSucursalPageState extends State<InventarioSucursalPage> {
     final file = File('${dir.path}/inventario_por_sucursal_exportado.csv');
     await file.writeAsString(csv);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Inventario exportado a: ${file.path}')),
+    SnackBarUtils.show(
+      context,
+      message: 'Inventario exportado a: ${file.path}',
+      type: SnackBarType.success,
     );
   }
 

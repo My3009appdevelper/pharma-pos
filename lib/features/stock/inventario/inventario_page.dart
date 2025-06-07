@@ -4,6 +4,7 @@ import 'package:pos_farmacia/features/stock/inventario/agregar_producto_page.dar
 import 'package:pos_farmacia/core/providers/inventario_provider.dart';
 import 'package:pos_farmacia/core/providers/inventario_sucursal_provider.dart';
 import 'package:pos_farmacia/core/providers/user_provider.dart';
+import 'package:pos_farmacia/widgets/custom_snackbar.dart';
 import 'package:pos_farmacia/widgets/navigation_rail_categories.dart';
 import 'package:pos_farmacia/core/models/product_model.dart';
 import 'package:pos_farmacia/features/stock/inventario/product_data_table.dart';
@@ -55,13 +56,11 @@ class _InventarioPageState extends State<InventarioPage> {
       } catch (e) {
         debugPrint('❌ Error al leer o parsear el CSV: $e');
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
+          SnackBarUtils.show(
+            context,
+            message:
                 '⚠️ No se pudo leer el archivo CSV.\nAsegúrate de que esté en formato UTF-8 y con la estructura correcta.',
-              ),
-              duration: Duration(seconds: 5),
-            ),
+            type: SnackBarType.warning,
           );
         }
         return;
@@ -160,13 +159,11 @@ class _InventarioPageState extends State<InventarioPage> {
 
       await provider.cargarDesdeBD();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            '✅ Importación completada.\nProductos agregados: $agregados\nDuplicados ignorados: $duplicados',
-          ),
-          duration: const Duration(seconds: 4),
-        ),
+      SnackBarUtils.show(
+        context,
+        message:
+            'Importación completada.\nProductos agregados: $agregados\nDuplicados ignorados: $duplicados',
+        type: SnackBarType.success,
       );
     }
   }
@@ -254,9 +251,11 @@ class _InventarioPageState extends State<InventarioPage> {
     final file = File('${dir.path}/productos_completos_exportados.csv');
     await file.writeAsString(csv);
 
-    ScaffoldMessenger.of(
+    SnackBarUtils.show(
       context,
-    ).showSnackBar(SnackBar(content: Text('Exportado a: ${file.path}')));
+      message: 'Exportado a: ${file.path}',
+      type: SnackBarType.success,
+    );
   }
 
   @override

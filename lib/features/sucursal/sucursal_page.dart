@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pos_farmacia/core/models/sucursal_model.dart';
 import 'package:pos_farmacia/core/providers/sucursal_provider.dart';
+import 'package:pos_farmacia/widgets/custom_snackbar.dart';
 import 'package:provider/provider.dart';
 
 class SucursalPage extends StatefulWidget {
@@ -55,8 +56,10 @@ class _SucursalPageState extends State<SucursalPage> {
       // 🔥 Refresca la lista después de importar
       await provider.cargarSucursales();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Sucursales importadas exitosamente')),
+      SnackBarUtils.show(
+        context,
+        message: 'Sucursales importadas exitosamente',
+        type: SnackBarType.success,
       );
     }
   }
@@ -86,9 +89,11 @@ class _SucursalPageState extends State<SucursalPage> {
     final file = File('${dir.path}/sucursales_exportadas.csv');
     await file.writeAsString(csv);
 
-    ScaffoldMessenger.of(
+    SnackBarUtils.show(
       context,
-    ).showSnackBar(SnackBar(content: Text('Exportado a: ${file.path}')));
+      message: 'Exportado a: ${file.path}',
+      type: SnackBarType.success,
+    );
   }
 
   @override

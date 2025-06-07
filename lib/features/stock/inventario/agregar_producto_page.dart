@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pos_farmacia/core/services/inventario_service.dart';
+import 'package:pos_farmacia/widgets/custom_snackbar.dart';
 import 'package:pos_farmacia/widgets/elevated_button.dart';
 import 'package:pos_farmacia/widgets/text_form_field.dart';
 import 'package:pos_farmacia/widgets/image_picker_field.dart';
@@ -89,15 +90,19 @@ class _AgregarProductoPageState extends State<AgregarProductoPage> {
 
       if (context.mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Producto agregado exitosamente')),
+        SnackBarUtils.show(
+          context,
+          message: 'Producto agregado exitosamente',
+          type: SnackBarType.success,
         );
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(
+        SnackBarUtils.show(
           context,
-        ).showSnackBar(SnackBar(content: Text('⚠️ ${e.toString()}')));
+          message: '⚠️ ${e.toString()}',
+          type: SnackBarType.warning,
+        );
       }
     } finally {
       setState(() => _loading = false);
