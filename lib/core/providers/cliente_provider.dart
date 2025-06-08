@@ -61,6 +61,13 @@ class ClienteProvider extends ChangeNotifier {
     await cargarClientes();
     notifyListeners();
   }
+
+  Future<void> cargarDesdeDB() async {
+    final clientesCargados = await _clienteService.obtenerClientes();
+    _clientes.clear();
+    _clientes.addAll(clientesCargados);
+    notifyListeners();
+  }
 }
 // This file is part of the POS Farmacia project.
 // It defines the ClienteProvider class which manages the state and operations related to clients in the pharmacy POS system.
