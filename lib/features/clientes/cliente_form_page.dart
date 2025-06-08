@@ -152,7 +152,7 @@ class _ClienteFormPageState extends State<ClienteFormPage> {
     final now = DateTime.now();
     final nuevoCliente = ClienteModel(
       id: widget.clienteExistente?.id,
-      uuidCliente: widget.clienteExistente?.uuidCliente ?? const Uuid().v4(),
+      uuid_cliente: widget.clienteExistente?.uuid_cliente ?? const Uuid().v4(),
       nombreCompleto: nombreController.text.trim(),
       apellido: apellidoController.text.trim(),
       telefono: telefonoController.text.trim(),

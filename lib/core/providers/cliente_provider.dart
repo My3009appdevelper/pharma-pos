@@ -39,7 +39,7 @@ class ClienteProvider extends ChangeNotifier {
   Future<void> actualizarCliente(ClienteModel cliente) async {
     await _clienteService.actualizarCliente(cliente);
     await cargarClientes();
-    if (_clienteSeleccionado?.uuidCliente == cliente.uuidCliente) {
+    if (_clienteSeleccionado?.uuid_cliente == cliente.uuid_cliente) {
       _clienteSeleccionado = cliente;
     }
     notifyListeners();
@@ -49,7 +49,7 @@ class ClienteProvider extends ChangeNotifier {
   Future<void> eliminarCliente(String uuidCliente) async {
     await _clienteService.eliminarClientePorUuid(uuidCliente);
     await cargarClientes();
-    if (_clienteSeleccionado?.uuidCliente == uuidCliente) {
+    if (_clienteSeleccionado?.uuid_cliente == uuidCliente) {
       limpiarSeleccion();
     }
     notifyListeners();

@@ -133,7 +133,7 @@ class _ClientesPageState extends State<ClientesPage> {
           }
 
           final cliente = ClienteModel(
-            uuidCliente: uuid,
+            uuid_cliente: uuid,
             nombreCompleto: row[1].toString(),
             apellido: row[2].toString(),
             telefono: row[3].toString(),
@@ -197,7 +197,7 @@ class _ClientesPageState extends State<ClientesPage> {
       ],
       ...clientes.map(
         (c) => [
-          c.uuidCliente,
+          c.uuid_cliente,
           c.nombreCompleto,
           c.apellido ?? '',
           c.telefono ?? '',

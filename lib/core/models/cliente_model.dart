@@ -1,6 +1,6 @@
 class ClienteModel {
   final int? id;
-  final String uuidCliente;
+  final String uuid_cliente;
 
   final String nombreCompleto;
   final String? apellido;
@@ -26,7 +26,7 @@ class ClienteModel {
 
   ClienteModel({
     this.id,
-    required this.uuidCliente,
+    required this.uuid_cliente,
     required this.nombreCompleto,
     this.apellido,
     this.telefono,
@@ -47,7 +47,7 @@ class ClienteModel {
   factory ClienteModel.fromMap(Map<String, dynamic> map) {
     return ClienteModel(
       id: map['id'],
-      uuidCliente: map['uuid_cliente'],
+      uuid_cliente: map['uuid_cliente'],
       nombreCompleto: map['nombreCompleto'],
       apellido: map['apellido'],
       telefono: map['telefono'],
@@ -70,7 +70,7 @@ class ClienteModel {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'uuid_cliente': uuidCliente,
+      'uuid_cliente': uuid_cliente,
       'nombreCompleto': nombreCompleto,
       'apellido': apellido,
       'telefono': telefono,
@@ -91,7 +91,7 @@ class ClienteModel {
 
   ClienteModel copyWith({
     int? id,
-    String? uuidCliente,
+    String? uuid_cliente,
     String? nombreCompleto,
     String? apellido,
     String? telefono,
@@ -110,7 +110,7 @@ class ClienteModel {
   }) {
     return ClienteModel(
       id: id ?? this.id,
-      uuidCliente: uuidCliente ?? this.uuidCliente,
+      uuid_cliente: uuid_cliente ?? this.uuid_cliente,
       nombreCompleto: nombreCompleto ?? this.nombreCompleto,
       apellido: apellido ?? this.apellido,
       telefono: telefono ?? this.telefono,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pos_farmacia/core/database/database_service.dart';
+import 'package:pos_farmacia/core/models/cliente_model.dart';
+import 'package:pos_farmacia/core/models/sucursal_model.dart';
 import 'package:pos_farmacia/core/models/venta_model.dart';
 import 'package:pos_farmacia/core/models/venta_detalle_model.dart';
 import 'package:pos_farmacia/core/services/venta_service.dart';
@@ -7,18 +9,44 @@ import 'package:pos_farmacia/core/services/venta_service.dart';
 class VentaProvider extends ChangeNotifier {
   final List<VentaModel> _ventas = [];
   final VentaService _service = VentaService();
+  final Map<String, ClienteModel> _clientesMap = {};
+  Map<int, SucursalModel> sucursalesMap = {};
 
   List<VentaModel> get ventas => List.unmodifiable(_ventas);
-
+  Map<String, ClienteModel> get clientesMap => _clientesMap;
   void cargarVentas(List<VentaModel> nuevas) {
     _ventas.clear();
     _ventas.addAll(nuevas);
     notifyListeners();
   }
 
+  Future<void> cargarClientesDesdeDB() async {
+    final db = await DatabaseService.database;
+    final result = await db.query('clientes');
+    _clientesMap.clear();
+    for (final row in result) {
+      final cliente = ClienteModel.fromMap(row);
+      _clientesMap[cliente.uuid_cliente] = cliente;
+    }
+  }
+
+  void cargarSucursales(List<SucursalModel> lista) {
+    sucursalesMap = {for (var s in lista) s.id!: s};
+    notifyListeners();
+  }
+
+  Future<void> cargarSucursalesDesdeDB() async {
+    final db = await DatabaseService.database;
+    final result = await db.query('sucursales');
+    final lista = result.map((e) => SucursalModel.fromMap(e)).toList();
+    cargarSucursales(lista); // usa tu método existente
+  }
+
   Future<void> cargarDesdeDB() async {
     final data = await _service.obtenerVentas();
     cargarVentas(data);
+    await cargarClientesDesdeDB();
+    await cargarSucursalesDesdeDB();
   }
 
   Future<void> procesarVenta(

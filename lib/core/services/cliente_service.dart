@@ -41,7 +41,7 @@ class ClienteService {
       'clientes',
       cliente.toMap(),
       where: 'uuid_cliente = ?',
-      whereArgs: [cliente.uuidCliente],
+      whereArgs: [cliente.uuid_cliente],
     );
   }
 
