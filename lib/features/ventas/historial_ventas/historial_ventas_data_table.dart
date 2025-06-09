@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pos_farmacia/core/models/venta_model.dart';
 import 'package:pos_farmacia/core/providers/venta_provider.dart';
-import 'package:pos_farmacia/features/ventas/detalle_venta_page.dart';
+import 'package:pos_farmacia/features/ventas/historial_ventas/detalle_venta_page.dart';
 import 'package:provider/provider.dart';
 
 class HistorialVentasDataTable extends StatefulWidget {

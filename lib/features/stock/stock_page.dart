@@ -101,8 +101,6 @@ class _StockPageState extends State<StockPage>
                             val,
                           );
                         }
-
-                        setState(() {});
                       },
                       items: [
                         const DropdownMenuItem<int?>(

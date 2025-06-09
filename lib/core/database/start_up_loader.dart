@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pos_farmacia/core/providers/app_state_provider.dart';
+import 'package:pos_farmacia/core/providers/inventario_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:pos_farmacia/core/providers/user_provider.dart';
 import 'package:pos_farmacia/core/providers/sucursal_provider.dart';
@@ -13,6 +15,12 @@ class StartupLoader {
       context,
       listen: false,
     );
+
+    final inventarioProvider = Provider.of<InventarioProvider>(
+      context,
+      listen: false,
+    );
+
     final inventarioSucursalProvider = Provider.of<InventarioSucursalProvider>(
       context,
       listen: false,
@@ -22,10 +30,11 @@ class StartupLoader {
       context,
       listen: false,
     );
+    final appState = Provider.of<AppStateProvider>(context, listen: false);
 
     final usuario = userProvider.usuarioActual;
+    await inventarioProvider.cargarDesdeBD();
 
-    // Cargar sucursales solo si es admin
     if (usuario?.rol == 'admin') {
       await sucursalProvider.cargarSucursales();
       await inventarioSucursalProvider.cargarDesdeBD();
@@ -33,8 +42,10 @@ class StartupLoader {
       await inventarioSucursalProvider.cargarPorSucursal(usuario!.idSucursal!);
     }
 
-    // Cargar clientes y ventas
     await clienteProvider.cargarDesdeDB();
     await ventaProvider.cargarDesdeDB();
+
+    // 🟢 AHORA SÍ marca la app como cargada
+    appState.marcarComoCargada();
   }
 }

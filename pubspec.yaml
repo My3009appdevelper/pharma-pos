@@ -26,6 +26,8 @@ dependencies:
   data_table_2: ^2.5.8
   image_picker: ^1.0.4
   uuid: ^3.0.7
+  pdf: ^3.10.1
+  printing: ^5.11.0
   
 
 dev_dependencies:

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pos_farmacia/core/providers/user_provider.dart';
 import 'package:pos_farmacia/core/providers/venta_provider.dart';
-import 'package:pos_farmacia/features/ventas/historial_ventas_data_table.dart'; // importa la tabla
+import 'package:pos_farmacia/features/ventas/historial_ventas/historial_ventas_data_table.dart'; // importa la tabla
 import 'package:provider/provider.dart';
 
 class HistorialVentasPage extends StatelessWidget {

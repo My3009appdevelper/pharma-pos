@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:pos_farmacia/core/providers/app_state_provider.dart';
 import 'package:pos_farmacia/core/themes/theme_provider.dart';
 import 'package:pos_farmacia/features/home_page.dart';
-import 'package:pos_farmacia/features/users/start_up_loader.dart';
+import 'package:pos_farmacia/core/database/start_up_loader.dart';
 import 'package:pos_farmacia/widgets/elevated_button.dart';
 import 'package:pos_farmacia/widgets/text_form_field.dart';
 import 'package:provider/provider.dart';
@@ -106,12 +107,19 @@ class _LoginPageState extends State<LoginPage> {
 
                             if (success) {
                               await StartupLoader.cargarDatosIniciales(context);
-                              Navigator.pushReplacement(
+
+                              final appState = Provider.of<AppStateProvider>(
                                 context,
-                                MaterialPageRoute(
-                                  builder: (_) => const HomePage(),
-                                ),
+                                listen: false,
                               );
+                              if (appState.appCargada) {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const HomePage(),
+                                  ),
+                                );
+                              }
                             } else {
                               setState(
                                 () =>

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:pos_farmacia/core/models/cliente_model.dart';
 import 'package:pos_farmacia/core/models/product_model.dart';
 import 'package:pos_farmacia/core/models/venta_model.dart';
+import 'package:pos_farmacia/core/providers/inventario_sucursal_provider.dart';
 import 'package:pos_farmacia/core/providers/user_provider.dart';
 import 'package:pos_farmacia/core/providers/venta_provider.dart';
 import 'package:pos_farmacia/features/ventas/buscar_producto_widget.dart';
@@ -36,11 +37,17 @@ class _VentasPageState extends State<VentasPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<DetalleVentaProvider>(
-        context,
-        listen: false,
-      ).limpiarDetalles();
+    Future.microtask(() async {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final inventarioSucursalProvider =
+          Provider.of<InventarioSucursalProvider>(context, listen: false);
+
+      final usuario = userProvider.usuarioActual;
+      if (usuario?.idSucursal != null) {
+        await inventarioSucursalProvider.cargarPorSucursal(
+          usuario!.idSucursal!,
+        );
+      }
     });
   }
 

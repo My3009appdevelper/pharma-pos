@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:pos_farmacia/core/providers/app_state_provider.dart';
 import 'package:pos_farmacia/features/clientes/clientes_page.dart';
 import 'package:pos_farmacia/features/stock/stock_page.dart';
 import 'package:pos_farmacia/features/sucursal/sucursal_page.dart';
-import 'package:pos_farmacia/features/ventas/historial_ventas_page.dart';
+import 'package:pos_farmacia/features/ventas/historial_ventas/historial_ventas_page.dart';
 import 'package:pos_farmacia/features/ventas/ventas_page.dart';
 import 'package:provider/provider.dart';
 import '../core/themes/theme_provider.dart';
@@ -14,6 +15,11 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appState = Provider.of<AppStateProvider>(context);
+    if (!appState.appCargada) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     final userProvider = Provider.of<UserProvider>(context);
     final themeProvider = Provider.of<ThemeProvider>(context);
     final usuario = userProvider.usuarioActual;
@@ -69,6 +75,8 @@ class HomePage extends StatelessWidget {
               tooltip: 'Cerrar sesión',
               onPressed: () {
                 userProvider.logout();
+                context.read<AppStateProvider>().reiniciar();
+
                 Navigator.pushReplacementNamed(context, '/');
               },
             ),
